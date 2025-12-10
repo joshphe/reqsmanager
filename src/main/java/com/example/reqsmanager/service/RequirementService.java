@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -41,6 +42,11 @@ public class RequirementService {
         return requirementRepository.count();
     }
 
+    // === START: 新增获取全量数据的方法 ===
+    public List<Requirement> findAll() {
+        return requirementRepository.findAll();
+    }
+    // === END: 新增 ===
 
     // === 已修正: 新增时保存所有通用信息 ===
     public Requirement createNewRequirement(RequirementGeneralDTO dto) {

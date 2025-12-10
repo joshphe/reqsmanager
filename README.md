@@ -56,6 +56,6 @@ ReqsManager 是一个基于 Java 和 Web 技术的简易需求管理平台，旨
 *   贡献代码
 *   完善文档
 
-## 📄 开源许可
-
-建议为该项目选择一个开源许可，例如 [MIT License](https://opensource.org/licenses/MIT)。
+## 2025年12月10日
+*   新增导出需求清单CSV文件功能
+*   新增拆分需求、架构管理功能
