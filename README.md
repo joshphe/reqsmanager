@@ -1,0 +1,61 @@
+# ReqsManager - 需求管理平台
+
+ReqsManager 是一个基于 Java 和 Web 技术的简易需求管理平台，旨在帮助开发团队或个人更高效地跟踪和管理项目需求。
+
+## ✨ 主要功能 (设想)
+
+*   **需求管理**: 创建、编辑、查看和删除项目需求。
+*   **需求列表**: 以列表形式清晰展示所有需求及其状态。
+*   **状态跟踪**: 为每个需求设置不同的状态（如：待处理、开发中、已完成）。
+*   **用户管理**: 简单的用户角色和权限管理。
+
+## 🛠️ 技术栈
+
+*   **后端**: Java, Spring Boot (推测)
+*   **前端**: HTML, CSS, JavaScript
+*   **构建工具**: Apache Maven
+
+## 🚀 快速开始
+
+请确保您的开发环境已安装以下软件：
+
+*   JDK 1.8 或更高版本
+*   Apache Maven 3.2+
+
+### 步骤
+
+1.  **克隆项目到本地**
+    ```bash
+    git clone https://github.com/joshphe/reqsmanager.git
+    ```
+
+2.  **进入项目目录**
+    ```bash
+    cd reqsmanager
+    ```
+
+3.  **使用 Maven 运行项目**
+    *   在 Windows 上:
+        ```bash
+        mvnw spring-boot:run
+        ```
+    *   在 macOS/Linux 上:
+        ```bash
+        ./mvnw spring-boot:run
+        ```
+
+4.  **访问应用**
+    项目成功启动后，在您的浏览器中访问 `http://localhost:8080` 即可看到应用界面。
+
+## 🤝 如何贡献
+
+欢迎您为该项目做出贡献！我们鼓励任何形式的贡献，包括但不限于：
+
+*   报告 Bug
+*   提交新的功能建议
+*   贡献代码
+*   完善文档
+
+## 📄 开源许可
+
+建议为该项目选择一个开源许可，例如 [MIT License](https://opensource.org/licenses/MIT)。
