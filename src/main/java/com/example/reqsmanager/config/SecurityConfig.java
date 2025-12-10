@@ -52,7 +52,7 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider)
                 .authorizeHttpRequests(auth -> auth
                         // === START: 添加 /register 到允许列表 ===
-                        .requestMatchers("/login", "/register", "/css/**", "/js/**", "/webjars/**", "/favicon.ico").permitAll()
+                        .requestMatchers("/login", "/register", "/css/**", "/static/js/**", "/webjars/**", "/favicon.ico").permitAll()
                         // === END: 添加 /register 到允许列表 ===
                         .anyRequest().authenticated()
                 )
