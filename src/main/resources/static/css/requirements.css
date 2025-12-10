@@ -1,0 +1,43 @@
+/* 可滚动表格的容器 */
+.table-responsive-container {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid #dee2e6;
+}
+
+/* --- 冻结列样式 --- */
+.table .col-frozen-left,
+.table .col-frozen-right {
+    position: -webkit-sticky;
+    position: sticky;
+    z-index: 1;
+    background-color: white;
+}
+.table .col-frozen-right { right: 0; }
+
+/* --- 通用表格样式 --- */
+.table thead th {
+    z-index: 2;
+    background-color: #343a40 !important;
+    color: white;
+    white-space: nowrap;
+}
+
+/* --- 特定列样式 (使用类名，不再依赖列的顺序) --- */
+.table .col-req-id {
+    left: 0;
+    min-width: 200px;
+}
+.table .col-req-name {
+    left: 200px;
+    min-width: 200px;
+    max-width: 250px;
+    white-space: normal;
+    overflow-wrap: break-word;
+}
+.table .col-schedule-date {
+    white-space: nowrap;
+}
+.table .col-actions {
+    min-width: 150px;
+}

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>架构管理</title>
+</head>
+<body>
+<div th:fragment="content">
+    <h1>架构管理</h1>
+    <hr>
+
+    <!-- 筛选表单 -->
+    <div class="mb-3">
+        <form th:action="@{/architecture/}" method="get" class="form-inline">
+            <input type="text" name="reqId" th:value="${reqId}" placeholder="输入需求编号筛选" class="form-control mr-2">
+            <input type="hidden" name="size" th:value="${page.size}">
+            <button type="submit" class="btn btn-primary">筛选</button>
+            <a th:href="@{/architecture/}" class="btn btn-secondary ml-2">清空筛选</a>
+        </form>
+    </div>
+
+    <!-- 表格 -->
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead class="thead-dark">
+            <tr>
+                <th class="col-req-id col-frozen-left">需求编号</th>
+                <th class="col-req-name col-frozen-left">需求名称</th>
+                <th>是否架构编写方案</th>
+                <th>方案交付日期</th>
+                <th>方案评审时间</th>
+                <th>概要设计交付日期</th>
+                <th>概要设计评审时间</th>
+                <th>代码Review时间</th>
+                <th class="col-actions col-frozen-right">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- 如果列表为空，显示提示信息 -->
+            <tr th:if="${page.empty}">
+                <td colspan="9" class="text-center">没有找到相关需求</td>
+            </tr>
+            <!-- 遍历数据 -->
+            <tr th:each="req : ${page.content}">
+                <td class="col-req-id col-frozen-left" th:text="${req.reqId}"></td>
+                <td class="col-req-name col-frozen-left" th:text="${req.name}"></td>
+                <td th:text="${req.hasArchPlan == true ? '是' : '否'}"></td>
+                <td th:text="${req.archPlanDeliveryDate != null ? #temporals.format(req.archPlanDeliveryDate, 'yyyy-MM-dd') : ''}"></td>
+                <td th:text="${req.archPlanReviewTime != null ? #temporals.format(req.archPlanReviewTime, 'yyyy-MM-dd') : ''}"></td>
+                <td th:text="${req.designDeliveryDate != null ? #temporals.format(req.designDeliveryDate, 'yyyy-MM-dd') : ''}"></td>
+                <td th:text="${req.designReviewTime != null ? #temporals.format(req.designReviewTime, 'yyyy-MM-dd') : ''}"></td>
+                <td th:text="${req.codeReviewTime != null ? #temporals.format(req.codeReviewTime, 'yyyy-MM-dd') : ''}"></td>
+                <td class="col-actions col-frozen-right">
+                    <a th:href="@{/architecture/edit/{id}(id=${req.id})}" class="btn btn-warning btn-sm">编辑</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 分页控件 -->
+    <div th:if="${page.totalPages > 0}" class="d-flex justify-content-end mt-3">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                <li class="page-item" th:classappend="${page.first} ? 'disabled'"><a class="page-link" th:href="@{/architecture/(size=${page.size}, page=0, reqId=${reqId})}">首页</a></li>
+                <li class="page-item" th:classappend="${page.first} ? 'disabled'"><a class="page-link" th:href="@{/architecture/(size=${page.size}, page=${page.number - 1}, reqId=${reqId})}">上一页</a></li>
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}" th:classappend="${i == page.number} ? 'active'"><a class="page-link" th:href="@{/architecture/(size=${page.size}, page=${i}, reqId=${reqId})}" th:text="${i + 1}"></a></li>
+                <li class="page-item" th:classappend="${page.last} ? 'disabled'"><a class="page-link" th:href="@{/architecture/(size=${page.size}, page=${page.number + 1}, reqId=${reqId})}">下一页</a></li>
+                <li class="page-item" th:classappend="${page.last} ? 'disabled'"><a class="page-link" th:href="@{/architecture/(size=${page.size}, page=${page.totalPages - 1}, reqId=${reqId})}">尾页</a></li>
+            </ul>
+        </nav>
+    </div>
+</div>
+</body>
+</html>

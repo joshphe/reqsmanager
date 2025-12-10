@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑需求分析信息</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-4">
+    <h1>编辑需求分析信息</h1>
+    <hr>
+    <form th:action="@{/analysis/save}" th:object="${dto}" method="post">
+        <input type="hidden" th:field="*{id}">
+
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">需求编号</label>
+            <div class="col-sm-9"><input type="text" th:field="*{reqId}" class="form-control-plaintext" readonly></div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label">需求名称</label>
+            <div class="col-sm-9"><input type="text" th:field="*{name}" class="form-control-plaintext" readonly></div>
+        </div>
+
+        <hr>
+
+        <div class="form-check mb-3">
+            <input type="checkbox" th:field="*{isAnalysisInvolved}" class="form-check-input">
+            <label class="form-check-label">是否需分介入</label>
+        </div>
+
+        <div class="form-group">
+            <label>团队需分人员</label>
+            <input type="text" th:field="*{analysisMembers}" class="form-control" placeholder="多人请用逗号分隔">
+        </div>
+
+        <div class="form-group">
+            <label>需分完成日期</label>
+            <input type="date" name="analysisFinishDate" class="form-control"
+                   th:value="${dto.analysisFinishDate != null ? #temporals.format(dto.analysisFinishDate, 'yyyy-MM-dd') : ''}">
+        </div>
+
+        <div class="form-group">
+            <label>需分产出物</label>
+            <input type="text" th:field="*{analysisOutput}" class="form-control" placeholder="例如：PRD文档链接, Story Map等">
+        </div>
+
+        <hr>
+
+        <div class="form-check mb-2">
+            <input type="checkbox" th:field="*{hasSpec}" class="form-check-input">
+            <label class="form-check-label">是否产出需规</label>
+        </div>
+
+        <div class="form-group">
+            <label>需规编写人员</label>
+            <input type="text" th:field="*{specWriter}" class="form-control">
+        </div>
+
+        <div class="form-check mb-2">
+            <input type="checkbox" th:field="*{isSpecReviewed}" class="form-check-input">
+            <label class="form-check-label">是否需规评审</label>
+        </div>
+
+        <div class="form-group">
+            <label>需规评审时间</label>
+            <!-- 1. 将 type 从 "datetime-local" 改为 "date" -->
+            <!-- 2. 将格式化字符串改为 'yyyy-MM-dd' -->
+            <input type="date" name="specReviewTime" class="form-control"
+                   th:value="${dto.specReviewTime != null ? #temporals.format(dto.specReviewTime, 'yyyy-MM-dd') : ''}">
+        </div>
+
+        <button type="submit" class="btn btn-primary">保存</button>
+        <a th:href="@{/analysis/}" class="btn btn-secondary">取消</a>
+    </form>
+</div>
+</body>
+</html>

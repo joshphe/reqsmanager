@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>需求分析管理</title>
+</head>
+<body>
+<div th:fragment="content">
+    <h1>需求分析管理</h1>
+    <hr>
+
+    <!-- 筛选表单 -->
+    <div class="mb-3">
+        <form th:action="@{/analysis/}" method="get" class="form-inline">
+            <input type="text" name="reqId" th:value="${reqId}" placeholder="输入需求编号筛选" class="form-control mr-2">
+            <input type="hidden" name="size" th:value="${page.size}">
+            <button type="submit" class="btn btn-primary">筛选</button>
+            <a th:href="@{/analysis/}" class="btn btn-secondary ml-2">清空筛选</a>
+        </form>
+    </div>
+
+    <!-- 表格 -->
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead class="thead-dark">
+            <tr>
+                <th class="col-req-id col-frozen-left">需求编号</th>
+                <th class="col-req-name col-frozen-left">需求名称</th>
+                <th>是否需分介入</th>
+                <th>团队需分人员</th>
+                <th>需分完成日期</th>
+                <th>需分产出物</th>
+                <th>是否产出需规</th>
+                <th>需规编写人员</th>
+                <th>是否需规评审</th>
+                <th>需规评审时间</th>
+                <th class="col-actions col-frozen-right">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- 如果列表为空，显示提示信息 -->
+            <tr th:if="${page.empty}">
+                <td colspan="11" class="text-center">没有找到相关需求</td>
+            </tr>
+            <!-- 遍历数据 -->
+            <tr th:each="req : ${page.content}">
+                <td class="col-req-id col-frozen-left" th:text="${req.reqId}"></td>
+                <td class="col-req-name col-frozen-left" th:text="${req.name}"></td>
+                <td th:text="${req.isAnalysisInvolved == true ? '是' : '否'}"></td>
+                <td th:text="${req.analysisMembers}"></td>
+                <td th:text="${req.analysisFinishDate != null ? #temporals.format(req.analysisFinishDate, 'yyyy-MM-dd') : ''}"></td>
+                <td th:text="${req.analysisOutput}"></td>
+                <td th:text="${req.hasSpec == true ? '是' : '否'}"></td>
+                <td th:text="${req.specWriter}"></td>
+                <td th:text="${req.isSpecReviewed == true ? '是' : '否'}"></td>
+                <!-- 只修改 specReviewTime 的格式 -->
+                <td th:text="${req.specReviewTime != null ? #temporals.format(req.specReviewTime, 'yyyy-MM-dd') : ''}"></td>
+                <td class="col-actions col-frozen-right">
+                    <a th:href="@{/analysis/edit/{id}(id=${req.id})}" class="btn btn-warning btn-sm">编辑</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 分页控件 -->
+    <div th:if="${page.totalPages > 0}" class="d-flex justify-content-end mt-3">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                <li class="page-item" th:classappend="${page.first} ? 'disabled'"><a class="page-link" th:href="@{/analysis/(size=${page.size}, page=0, reqId=${reqId})}">首页</a></li>
+                <li class="page-item" th:classappend="${page.first} ? 'disabled'"><a class="page-link" th:href="@{/analysis/(size=${page.size}, page=${page.number - 1}, reqId=${reqId})}">上一页</a></li>
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}" th:classappend="${i == page.number} ? 'active'"><a class="page-link" th:href="@{/analysis/(size=${page.size}, page=${i}, reqId=${reqId})}" th:text="${i + 1}"></a></li>
+                <li class="page-item" th:classappend="${page.last} ? 'disabled'"><a class="page-link" th:href="@{/analysis/(size=${page.size}, page=${page.number + 1}, reqId=${reqId})}">下一页</a></li>
+                <li class="page-item" th:classappend="${page.last} ? 'disabled'"><a class="page-link" th:href="@{/analysis/(size=${page.size}, page=${page.totalPages - 1}, reqId=${reqId})}">尾页</a></li>
+            </ul>
+        </nav>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- 这个 head 只是为了让IDE识别，实际不会被渲染 -->
+    <meta charset="UTF-8">
+    <title>需求管理</title>
+    <!-- 冻结列和换行的所有样式 -->
+</head>
+<body>
+<div th:fragment="content">
+    <h1>需求信息管理</h1>
+    <hr>
+    <div class="d-flex justify-content-between mb-3">
+        <form th:action="@{/requirements/}" method="get" class="form-inline">
+            <input type="text" name="reqId" th:value="${reqId}" placeholder="需求编号" class="form-control mr-2">
+            <input type="date" name="scheduleDate" th:value="${scheduleDate}" class="form-control mr-2">
+            <input type="hidden" name="size" th:value="${size}">
+            <button type="submit" class="btn btn-primary">筛选</button>
+            <a th:href="@{/requirements/}" class="btn btn-secondary ml-2">清空筛选</a>
+        </form>
+        <a th:href="@{/requirements/showNewRequirementForm}" class="btn btn-success">新增需求</a>
+    </div>
+
+    <div class="table-responsive-container">
+        <table class="table table-bordered table-striped">
+            <thead class="thead-dark">
+            <tr>
+                <th>需求编号</th><th>需求名称</th><th>需求牵头人</th><th>需求排期</th><th>是否需求团队介入</th><th>是否出需规</th><th>是否编写方案</th><th>方案提交人</th><th>是否提交概要设计</th><th>概要设计提交时间</th><th>备注</th><th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="req : ${requirementsPage.content}">
+                <td th:text="${req.reqId}"></td>
+                <td th:text="${req.name}"></td>
+                <td th:text="${req.leader}"></td>
+                <td th:text="${req.scheduleDate != null ? #temporals.format(req.scheduleDate, 'yyyy-MM-dd') : ''}"></td>
+                <td th:text="${req.isTeamInvolved == true ? '是' : '否'}"></td>
+                <td th:text="${req.hasSpec == true ? '是' : '否'}"></td>
+                <td th:text="${req.hasPlan == true ? '是' : '否'}"></td>
+                <td th:text="${req.planSubmitter}"></td>
+                <td th:text="${req.hasDesign == true ? '是' : '否'}"></td>
+                <td th:text="${req.designSubmitTime != null ? #temporals.format(req.designSubmitTime, 'yyyy-MM-dd HH:mm') : ''}"></td>
+                <td th:text="${req.remarks}"></td>
+                <td>
+                    <a th:href="@{/requirements/showFormForUpdate/{id}(id=${req.id})}" class="btn btn-warning btn-sm">编辑</a>
+                    <a th:href="@{/requirements/deleteRequirement/{id}(id=${req.id})}" class="btn btn-danger btn-sm" onclick="return confirm('确定删除吗?')">删除</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div th:if="${requirementsPage.totalPages > 0}" class="d-flex justify-content-between mt-3">
+        <form th:action="@{/requirements/}" method="get" class="form-inline">
+            <input type="hidden" name="reqId" th:value="${reqId}">
+            <input type="hidden" name="scheduleDate" th:value="${scheduleDate}">
+            <label class="mr-2">每页</label>
+            <select name="size" class="form-control form-control-sm" onchange="this.form.submit()">
+                <option th:each="s : ${#numbers.sequence(10, 50, 10)}" th:value="${s}" th:text="${s}" th:selected="${s == size}"></option>
+            </select>
+            <label class="ml-2">条</label>
+        </form>
+
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                <li class="page-item" th:classappend="${requirementsPage.first} ? 'disabled'"><a class="page-link" th:href="@{/requirements/(size=${size}, page=0, reqId=${reqId}, scheduleDate=${scheduleDate})}">首页</a></li>
+                <li class="page-item" th:classappend="${requirementsPage.first} ? 'disabled'"><a class="page-link" th:href="@{/requirements/(size=${size}, page=${requirementsPage.number - 1}, reqId=${reqId}, scheduleDate=${scheduleDate})}">上一页</a></li>
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, requirementsPage.totalPages - 1)}" th:classappend="${i == requirementsPage.number} ? 'active'"><a class="page-link" th:href="@{/requirements/(size=${size}, page=${i}, reqId=${reqId}, scheduleDate=${scheduleDate})}" th:text="${i + 1}"></a></li>
+                <li class="page-item" th:classappend="${requirementsPage.last} ? 'disabled'"><a class="page-link" th:href="@{/requirements/(size=${size}, page=${requirementsPage.number + 1}, reqId=${reqId}, scheduleDate=${scheduleDate})}">下一页</a></li>
+                <li class="page-item" th:classappend="${requirementsPage.last} ? 'disabled'"><a class="page-link" th:href="@{/requirements/(size=${size}, page=${requirementsPage.totalPages - 1}, reqId=${reqId}, scheduleDate=${scheduleDate})}">尾页</a></li>
+            </ul>
+        </nav>
+    </div>
+</div>
+</body>
+</html>

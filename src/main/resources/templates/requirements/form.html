@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <!-- 页面标题会根据是“新增”还是“编辑”动态变化 -->
+    <title th:text="${pageTitle}"></title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-4">
+    <h1 th:text="${pageTitle}"></h1>
+    <hr>
+
+    <!--
+      表单会提交到 /requirements/save 路径。
+      th:object="${dto}" 将表单与后端的 RequirementGeneralDTO 对象绑定。
+    -->
+    <form th:action="@{/requirements/save}" th:object="${dto}" method="post">
+
+        <!--
+          隐藏的 ID 字段。
+          - 新增时, dto.id 为 null。
+          - 编辑时, dto.id 有值。
+          后端 Controller 根据 ID 是否为 null 来区分是创建还是更新操作。
+        -->
+        <input type="hidden" th:field="*{id}">
+
+        <!-- 需求编号和名称 -->
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label>需求编号</label>
+                <!--
+                  th:readonly="${dto.id != null}"：
+                  如果是编辑模式 (id 不为 null), 此输入框为只读，防止核心ID被修改。
+                  如果是新增模式 (id 为 null), 此输入框可写。
+                -->
+                <input type="text" th:field="*{reqId}" class="form-control" placeholder="例如：REQ-2025-001"
+                       th:readonly="${dto.id != null}" required>
+            </div>
+            <div class="form-group col-md-6">
+                <label>需求名称</label>
+                <input type="text" th:field="*{name}" class="form-control" placeholder="输入需求的简短描述"
+                       th:readonly="${dto.id != null}" required>
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- 业务和技术负责人 -->
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label>需求业务负责人</label>
+                <input type="text" th:field="*{businessLeader}" class="form-control" placeholder="输入业务方联系人">
+            </div>
+            <div class="form-group col-md-6">
+                <label>需求科技负责人</label>
+                <input type="text" th:field="*{techLeader}" class="form-control" placeholder="输入技术方联系人">
+            </div>
+        </div>
+
+        <!-- 业务条线和开发负责人 -->
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label>业务条线</label>
+                <input type="text" th:field="*{businessLine}" class="form-control" placeholder="例如：零售银行、公司金融">
+            </div>
+            <div class="form-group col-md-6">
+                <label>开发负责人</label>
+                <input type="text" th:field="*{devLeader}" class="form-control" placeholder="输入主要开发人员">
+            </div>
+        </div>
+
+        <!-- 需求排期 -->
+        <div class="form-group">
+            <label>需求排期</label>
+            <!--
+              对于日期类型，手动使用 name 和 th:value 来设置，
+              并用 #temporals.format 格式化，确保能正确回显已保存的值。
+            -->
+            <input type="date" name="scheduleDate" class="form-control"
+                   th:value="${dto.scheduleDate != null ? #temporals.format(dto.scheduleDate, 'yyyy-MM-dd') : ''}">
+        </div>
+
+        <!-- 操作按钮 -->
+        <button type="submit" class="btn btn-primary">保存</button>
+        <a th:href="@{/requirements/}" class="btn btn-secondary">取消</a>
+    </form>
+</div>
+</body>
+</html>

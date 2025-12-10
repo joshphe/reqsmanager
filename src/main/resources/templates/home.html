@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="content">
+    <h1>主页看板</h1>
+    <hr>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-header">需求总数量</div>
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${totalRequirements}">0</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

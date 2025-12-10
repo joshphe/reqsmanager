@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>需求管理系统</title>
+
+  <!-- 引入 Bootstrap 核心 CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+  <!--
+    条件加载表格样式：
+    如果 view 变量的值以 'requirements' 或 'analysis' 或 'architecture' 开头,
+    就引入我们自定义的 requirements.css 文件。
+  -->
+  <link rel="stylesheet"
+        th:if="${view.startsWith('requirements') or view.startsWith('analysis') or view.startsWith('architecture')}"
+        th:href="@{/css/requirements.css}">
+
+  <!-- 基础布局样式 -->
+  <style>
+    body {
+      display: flex;
+    }
+    .sidebar {
+      width: 220px;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background-color: #343a40;
+      padding-top: 20px;
+    }
+    .sidebar .nav-link {
+      color: #c2c7d0;
+    }
+    .sidebar .nav-link.active, .sidebar .nav-link:hover {
+      color: #fff;
+      background-color: #494e53;
+    }
+    .main-content {
+      margin-left: 220px;
+      padding: 20px;
+      width: calc(100% - 220px);
+    }
+  </style>
+</head>
+<body>
+
+<!-- 左侧导航栏 -->
+<nav class="sidebar">
+  <ul class="nav flex-column">
+    <li class="nav-item">
+      <a class="nav-link" th:href="@{/}" th:classappend="${view.startsWith('home') ? 'active' : ''}">主页</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" th:href="@{/requirements/}" th:classappend="${view.startsWith('requirements') ? 'active' : ''}">需求管理</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" th:href="@{/analysis/}" th:classappend="${view.startsWith('analysis') ? 'active' : ''}">需求分析管理</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" th:href="@{/architecture/}" th:classappend="${view.startsWith('architecture') ? 'active' : ''}">架构管理</a>
+    </li>
+  </ul>
+</nav>
+
+<!-- 主内容区：Thymeleaf 会将其他模板的 "content" 片段替换到这里 -->
+<main class="main-content">
+  <div th:replace="~{${view} :: content}"></div>
+</main>
+
+<!-- 核心 JavaScript 库 -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>
