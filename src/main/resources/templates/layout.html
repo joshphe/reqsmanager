@@ -62,6 +62,11 @@
       <a class="nav-link" th:href="@{/architecture/}" th:classappend="${view.startsWith('architecture') ? 'active' : ''}">架构管理</a>
     </li>
   </ul>
+  <!-- === START: 添加登出表单 === -->
+  <form class="p-3" th:action="@{/logout}" method="post">
+    <button type="submit" class="btn btn-outline-light btn-block">登出</button>
+  </form>
+  <!-- === END: 添加登出表单 === -->
 </nav>
 
 <!-- 主内容区：Thymeleaf 会将其他模板的 "content" 片段替换到这里 -->
