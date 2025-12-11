@@ -8,12 +8,12 @@
   <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
 
   <!--
-    条件加载表格样式：
-    如果 view 变量的值以 'requirements' 或 'analysis' 或 'architecture' 开头,
-    就引入我们自定义的 requirements.css 文件。
+    条件加载通用表格样式:
+    如果 view 变量的值以 'requirements', 'analysis', 'architectural', 或 'arch-projects' 开头,
+    就引入我们统一的 requirements.css 文件。
   -->
   <link rel="stylesheet"
-        th:if="${view.startsWith('requirements') or view.startsWith('analysis') or view.startsWith('architecture')}"
+        th:if="${view.startsWith('requirements') or view.startsWith('analysis') or view.startsWith('architectural') or view.startsWith('arch-projects')}"
         th:href="@{/css/requirements.css}">
 
   <!-- 基础布局样式 -->
@@ -59,14 +59,16 @@
       <a class="nav-link" th:href="@{/analysis/}" th:classappend="${view.startsWith('analysis') ? 'active' : ''}">需求分析管理</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" th:href="@{/architecture/}" th:classappend="${view.startsWith('architecture') ? 'active' : ''}">架构管理</a>
+      <a class="nav-link" th:href="@{/architectural/}" th:classappend="${view.startsWith('architectural') ? 'active' : ''}">架构需求管理</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" th:href="@{/arch-projects/}" th:classappend="${view.startsWith('arch-projects') ? 'active' : ''}">架构项目管理</a>
     </li>
   </ul>
-  <!-- === START: 添加登出表单 === -->
+
   <form class="p-3" th:action="@{/logout}" method="post">
     <button type="submit" class="btn btn-outline-light btn-block">登出</button>
   </form>
-  <!-- === END: 添加登出表单 === -->
 </nav>
 
 <!-- 主内容区：Thymeleaf 会将其他模板的 "content" 片段替换到这里 -->
@@ -75,9 +77,9 @@
 </main>
 
 <!-- 核心 JavaScript 库 -->
-<script src="@{/js/jquery-3.7.1.slim.min.js}"></script>
-<script src="@{/js/popper.min.js}"></script>
-<script src="@{/js/bootstrap.min.js}"></script>
+<script th:src="@{/js/jquery-3.5.1.slim.min.js}"></script>
+<script th:src="@{/js/popper.min.js}"></script>
+<script th:src="@{/js/bootstrap.min.js}"></script>
 
 </body>
 </html>

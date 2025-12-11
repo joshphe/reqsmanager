@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑架构需求信息</title>
+    <!-- 使用本地 CSS 链接 -->
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+<body>
+<div class="container mt-5 mb-5">
+    <h1>编辑架构需求信息</h1>
+    <hr>
+    <form th:action="@{/architectural/save}" th:object="${dto}" method="post">
+        <input type="hidden" th:field="*{id}">
+        <input type="hidden" th:field="*{requirementId}">
+
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label font-weight-bold">需求编号</label>
+            <div class="col-sm-9"><input type="text" th:field="*{reqId}" class="form-control-plaintext" readonly></div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label font-weight-bold">需求名称</label>
+            <div class="col-sm-9"><input type="text" th:field="*{name}" class="form-control-plaintext" readonly></div>
+        </div>
+
+        <hr>
+
+        <!-- 是/否 类型的字段 (th:field 对 checkbox 支持良好) -->
+        <div class="form-row mb-3">
+            <div class="col-auto"><div class="form-check">
+                <input type="checkbox" th:field="*{importantRequirement}" class="form-check-input">
+                <label class="form-check-label">是否重要需求</label>
+            </div></div>
+            <div class="col-auto"><div class="form-check">
+                <input type="checkbox" th:field="*{summaryDesignSubmitted}" class="form-check-input">
+                <label class="form-check-label">是否递交概要设计</label>
+            </div></div>
+            <div class="col-auto"><div class="form-check">
+                <input type="checkbox" th:field="*{detailedDesignSubmitted}" class="form-check-input">
+                <label class="form-check-label">是否递交详细设计</label>
+            </div></div>
+        </div>
+        <div class="form-row mb-3">
+            <div class="col-auto"><div class="form-check">
+                <input type="checkbox" th:field="*{involvesArchDecision}" class="form-check-input">
+                <label class="form-check-label">是否涉及架构决策</label>
+            </div></div>
+            <div class="col-auto"><div class="form-check">
+                <input type="checkbox" th:field="*{involvesInfra}" class="form-check-input">
+                <label class="form-check-label">是否涉及基础架构</label>
+            </div></div>
+            <div class="col-auto"><div class="form-check">
+                <input type="checkbox" th:field="*{involvesSeniorReport}" class="form-check-input">
+                <label class="form-check-label">是否涉及高阶汇报</label>
+            </div></div>
+        </div>
+
+        <hr>
+
+        <!-- 概要设计相关 -->
+        <h5>概要设计</h5>
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <label>概要设计递交人</label>
+                <input type="text" th:field="*{summaryDesignSubmitter}" class="form-control">
+            </div>
+            <!-- === START: 修正此处的日期输入框 === -->
+            <div class="form-group col-md-4">
+                <label>概要设计递交日期</label>
+                <input type="date" name="summaryDesignSubmitDate" class="form-control"
+                       th:value="${dto.summaryDesignSubmitDate != null ? #temporals.format(dto.summaryDesignSubmitDate, 'yyyy-MM-dd') : ''}">
+            </div>
+            <div class="form-group col-md-4">
+                <label>概要设计评审通过日期</label>
+                <input type="date" name="summaryDesignReviewPassDate" class="form-control"
+                       th:value="${dto.summaryDesignReviewPassDate != null ? #temporals.format(dto.summaryDesignReviewPassDate, 'yyyy-MM-dd') : ''}">
+            </div>
+            <!-- === END: 修正此处的日期输入框 === -->
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-2">
+                <label>概要设计评分</label>
+                <input type="number" th:field="*{summaryDesignScore}" class="form-control">
+            </div>
+            <div class="form-group col-md-10">
+                <label>概要设计扣分原因</label>
+                <textarea th:field="*{summaryDesignDeductionReason}" class="form-control" rows="1"></textarea>
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- 详细设计相关 -->
+        <h5>详细设计</h5>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label>详细设计递交人</label>
+                <input type="text" th:field="*{detailedDesignSubmitter}" class="form-control">
+            </div>
+            <!-- === START: 修正此处的日期输入框 === -->
+            <div class="form-group col-md-6">
+                <label>详细设计递交日期</label>
+                <input type="date" name="detailedDesignSubmitDate" class="form-control"
+                       th:value="${dto.detailedDesignSubmitDate != null ? #temporals.format(dto.detailedDesignSubmitDate, 'yyyy-MM-dd') : ''}">
+            </div>
+            <!-- === END: 修正此处的日期输入框 === -->
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-2">
+                <label>详细设计评分</label>
+                <input type="number" th:field="*{detailedDesignScore}" class="form-control">
+            </div>
+            <div class="form-group col-md-10">
+                <label>详细设计扣分原因</label>
+                <textarea th:field="*{detailedDesignDeductionReason}" class="form-control" rows="1"></textarea>
+            </div>
+        </div>
+
+        <hr>
+
+        <button type="submit" class="btn btn-primary">保存架构信息</button>
+        <a th:href="@{/architectural/}" class="btn btn-secondary">取消</a>
+    </form>
+</div>
+</body>
+</html>

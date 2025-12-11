@@ -1,43 +1,87 @@
-/* 可滚动表格的容器 */
-.table-responsive-container {
+/*
+ * ======================================================
+ * == 所有管理页面的通用、健壮的表格样式表 (最终版) ==
+ * ======================================================
+ */
+
+/* 1. 滚动容器 */
+.table-responsive {
     width: 100%;
     overflow-x: auto;
     border: 1px solid #dee2e6;
 }
 
-/* --- 冻结列样式 --- */
-.table .col-frozen-left,
-.table .col-frozen-right {
-    position: -webkit-sticky;
-    position: sticky;
-    z-index: 1;
-    background-color: white;
-}
-.table .col-frozen-right { right: 0; }
-
-/* --- 通用表格样式 --- */
+/* 2. 通用表头样式 */
 .table thead th {
     z-index: 2;
     background-color: #343a40 !important;
     color: white;
-    white-space: nowrap;
+    white-space: nowrap; /* 确保所有表头都不换行 */
 }
 
-/* --- 特定列样式 (使用类名，不再依赖列的顺序) --- */
-.table .col-req-id {
-    left: 0;
+
+/*
+ * ============================================
+ * == 冻结列核心样式 (Frozen Column Core) ==
+ * ============================================
+ */
+
+/* 3. 任何需要冻结的列，都必须有 .frozen 类 */
+.table th.frozen,
+.table td.frozen {
+    position: -webkit-sticky;
+    position: sticky;
+    z-index: 1;
+    background-color: white; /* 覆盖滚动内容的背景 */
+}
+/* 确保冻结的表头在最上层 */
+.table thead th.frozen {
+    z-index: 3;
+}
+
+
+/*
+ * 4. 按位置定义的冻结规则 (Positioning Rules)
+ *    为每个冻结位置创建一个类，精确控制 left 偏移
+ */
+
+/* --- 左侧冻结 --- */
+.table .frozen.col-1 { left: 0; }
+.table .frozen.col-2 { left: 200px; } /* 偏移 = col-1 宽度 */
+.table .frozen.col-3 { left: 400px; } /* 偏移 = col-1 + col-2 宽度 */
+
+/* --- 右侧冻结 --- */
+.table .frozen.col-last { right: 0; }
+
+
+/*
+ * ============================================
+ * == 特定列的宽度和换行样式 (Column Sizing) ==
+ * ============================================
+ */
+
+/* 5. 通过类名定义宽度和换行，不再依赖 nth-child */
+
+/* 需求/项目编号 */
+.table .col-req-id,
+.table .col-project-number {
     min-width: 200px;
 }
+
+/* 需求名称 */
 .table .col-req-name {
-    left: 200px;
-    min-width: 200px;
-    max-width: 250px;
+    min-width: 200px; /* 最小宽度 */
+    max-width: 250px; /* 超过此宽度后换行 */
     white-space: normal;
     overflow-wrap: break-word;
 }
-.table .col-schedule-date {
-    white-space: nowrap;
-}
+
+/* 操作列 */
 .table .col-actions {
     min-width: 150px;
+}
+
+/* 需求排期列 */
+.table .col-schedule-date {
+    white-space: nowrap;
 }

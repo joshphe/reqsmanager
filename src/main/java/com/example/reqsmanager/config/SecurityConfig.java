@@ -22,9 +22,6 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    /**
-     * 自定义的用户服务，告诉 Spring Security 如何根据用户名加载用户
-     */
     @Bean
     public AuthenticationProvider authenticationProvider(CustomUserDetailsService userDetailsService) {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -33,27 +30,20 @@ public class SecurityConfig {
         return authProvider;
     }
 
-    /**
-     * 认证管理器，登录认证的核心组件
-     * Spring Boot 3.x / Security 6.x 的标准配置方式
-     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
-    /**
-     * 配置 HTTP 安全规则，定义哪些 URL 需要保护，哪些可以匿名访问
-     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationProvider authenticationProvider) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .authenticationProvider(authenticationProvider)
                 .authorizeHttpRequests(auth -> auth
-                        // === START: 添加 /register 到允许列表 ===
-                        .requestMatchers("/login", "/register", "/css/**", "/static/js/**", "/webjars/**", "/favicon.ico").permitAll()
-                        // === END: 添加 /register 到允许列表 ===
+                        // === START: 核心修正，将 /error 加入白名单 ===
+                        .requestMatchers("/login", "/register", "/error", "/css/**", "/js/**", "/webjars/**", "/favicon.ico").permitAll()
+                        // === END: 核心修正 ===
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

@@ -119,43 +119,18 @@ public class Requirement {
     // =========== 架构管理 (Architecture) 字段 ===========
     // ==================================================
 
+    // === 2025-12-11 START: 关键修改 ===
     /**
-     * 是否架构编写方案
+     * 与架构需求信息建立一对一关联。
+     * CascadeType.ALL: 当保存/删除 Requirement 时，关联的 ArchitecturalRequirement 也会被一并保存/删除。
+     * mappedBy = "requirement": 表示这个关联关系由 ArchitecturalRequirement 实体中的 "requirement" 字段来维护。
      */
-    @Column(columnDefinition = "BIT(1) COMMENT '是否架构编写方案'")
-    private Boolean hasArchPlan = false;
+    @OneToOne(mappedBy = "requirement", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private ArchitecturalRequirement architecturalRequirement;
 
-    /**
-     * 方案交付日期
-     */
-    @Column(columnDefinition = "DATE COMMENT '方案交付日期'")
-    private LocalDate archPlanDeliveryDate;
-
-    /**
-     * 方案评审时间
-     * 类型从 LocalDateTime 修改为 LocalDate
-     */
-    @Column(columnDefinition = "DATE COMMENT '方案评审时间'")
-    private LocalDate archPlanReviewTime;
-
-    /**
-     * 概要设计交付日期
-     */
-    @Column(columnDefinition = "DATE COMMENT '概要设计交付日期'")
-    private LocalDate designDeliveryDate;
-
-    /**
-     * 概要设计评审时间
-     * 类型从 LocalDateTime 修改为 LocalDate
-     */
-    @Column(columnDefinition = "DATE COMMENT '概要设计评审时间'")
-    private LocalDate designReviewTime;
-
-
-    /**
-     * 代码 Review 时间
-     * 类型从 LocalDateTime 修改为 LocalDate
-     */
-    @Column(columnDefinition = "DATE COMMENT '代码Review时间'")
-    private LocalDate codeReviewTime;
+    // 删除旧的架构字段
+    // private Boolean hasArchPlan;
+    // private LocalDate archPlanDeliveryDate;
+    // ... 删除所有旧的架构字段 ...
+    // === END: 关键修改 ===
 }

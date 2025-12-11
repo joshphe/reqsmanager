@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>架构项目管理</title>
+</head>
+<body>
+<div th:fragment="content">
+  <h1>架构项目管理</h1>
+  <hr>
+
+  <!-- 顶部操作栏：筛选和新增 -->
+  <div class="d-flex justify-content-between mb-3">
+    <form th:action="@{/arch-projects/}" method="get" class="form-inline">
+      <input type="text" name="reqId" th:value="${reqId}" placeholder="按需求编号筛选" class="form-control mr-2">
+      <input type="hidden" name="size" th:value="${page.size}">
+      <button type="submit" class="btn btn-primary">筛选</button>
+      <a th:href="@{/arch-projects/}" class="btn btn-secondary ml-2">清空筛选</a>
+    </form>
+    <!-- === START: 按钮组 === -->
+    <div>
+      <a th:href="@{/arch-projects/create}" class="btn btn-success">新增项目</a>
+      <!-- 新增导出按钮 -->
+      <a th:href="@{/arch-projects/export}" class="btn btn-info ml-2">导出 CSV</a>
+    </div>
+    <!-- === END: 按钮组 === -->
+  </div>
+
+  <!-- 表格容器 -->
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped">
+      <thead class="thead-dark">
+      <tr>
+        <th class="frozen col-1 col-project-number">项目编号</th>
+        <th class="frozen col-2 col-req-id">需求编号</th>
+        <th class="frozen col-3 col-req-name">需求名称</th>
+        <th>是否重点项目</th>
+        <th>可行性方案递交人</th>
+        <th>可行性方案递交日期</th>
+        <th>可行性方案评审通过日期</th>
+        <th>总体设计递交人</th>
+        <th>总体设计递交日期</th>
+        <th>总体设计评审通过日期</th>
+        <th>详细设计递交人</th>
+        <th>详细设计递交日期</th>
+        <th>可行性方案评分</th>
+        <th>可行性方案扣分原因</th>
+        <th>总体设计评分</th>
+        <th>总体设计扣分原因</th>
+        <th>详细设计评分</th>
+        <th>详细设计扣分原因</th>
+        <th>备注</th>
+        <th class="frozen col-last col-actions">操作</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:if="${page.empty}">
+        <td colspan="20" class="text-center">没有找到相关项目</td>
+      </tr>
+      <tr th:each="proj : ${page.content}">
+        <td class="frozen col-1 col-project-number" th:text="${proj.projectNumber}"></td>
+        <td class="frozen col-2 col-req-id" th:text="${proj.reqId}"></td>
+        <td class="frozen col-3 col-req-name" th:text="${proj.reqName}"></td>
+        <td th:text="${proj.keyProject ? '是' : '否'}"></td>
+        <td th:text="${proj.feasibilitySubmitter}"></td>
+
+        <!-- === START: 修正“可行性方案递交日期”列 === -->
+        <td>
+                    <span th:style="${proj.feasibilitySubmitDate == null} ? 'color: red; font-weight: bold;' : 'color: black;'"
+                          th:text="${proj.feasibilitySubmitDate != null ? #temporals.format(proj.feasibilitySubmitDate, 'yyyy-MM-dd') : '未递交'}">
+                    </span>
+        </td>
+        <!-- === END: 修正 === -->
+
+        <td th:text="${proj.feasibilityReviewPassDate != null ? #temporals.format(proj.feasibilityReviewPassDate, 'yyyy-MM-dd') : ''}"></td>
+        <td th:text="${proj.generalDesignSubmitter}"></td>
+
+        <!-- === START: 修正“总体设计递交日期”列 === -->
+        <td>
+                    <span th:style="${proj.generalDesignSubmitDate == null} ? 'color: red; font-weight: bold;' : 'color: black;'"
+                          th:text="${proj.generalDesignSubmitDate != null ? #temporals.format(proj.generalDesignSubmitDate, 'yyyy-MM-dd') : '未递交'}">
+                    </span>
+        </td>
+        <!-- === END: 修正 === -->
+
+        <td th:text="${proj.generalDesignReviewPassDate != null ? #temporals.format(proj.generalDesignReviewPassDate, 'yyyy-MM-dd') : ''}"></td>
+        <td th:text="${proj.detailedDesignSubmitter}"></td>
+
+        <!-- === START: 修正“详细设计递交日期”列 === -->
+        <td>
+                    <span th:style="${proj.detailedDesignSubmitDate == null} ? 'color: red; font-weight: bold;' : 'color: black;'"
+                          th:text="${proj.detailedDesignSubmitDate != null ? #temporals.format(proj.detailedDesignSubmitDate, 'yyyy-MM-dd') : '未递交'}">
+                    </span>
+        </td>
+        <!-- === END: 修正 === -->
+
+        <td th:text="${proj.feasibilityScore}"></td>
+        <td th:text="${proj.feasibilityDeductionReason}"></td>
+        <td th:text="${proj.generalDesignScore}"></td>
+        <td th:text="${proj.generalDesignDeductionReason}"></td>
+        <td th:text="${proj.detailedDesignScore}"></td>
+        <td th:text="${proj.detailedDesignDeductionReason}"></td>
+        <td th:text="${proj.remarks}"></td>
+        <td class="frozen col-last col-actions">
+          <a th:href="@{/arch-projects/edit/{id}(id=${proj.id})}" class="btn btn-warning btn-sm">维护</a>
+          <a th:href="@{/arch-projects/delete/{id}(id=${proj.id})}" class="btn btn-danger btn-sm ml-2" onclick="return confirm('确定要删除这个项目吗？');">删除</a>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 分页控件 -->
+  <div th:if="${page.totalPages > 0}" class="d-flex justify-content-end mt-3">
+    <nav aria-label="Page navigation">
+      <ul class="pagination">
+        <li class="page-item" th:classappend="${page.first} ? 'disabled'"><a class="page-link" th:href="@{/arch-projects/(size=${page.size}, page=0, reqId=${reqId})}">首页</a></li>
+        <li class="page-item" th:classappend="${page.first} ? 'disabled'"><a class="page-link" th:href="@{/arch-projects/(size=${page.size}, page=${page.number - 1}, reqId=${reqId})}">上一页</a></li>
+        <li class="page-item" th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}" th:classappend="${i == page.number} ? 'active'"><a class="page-link" th:href="@{/arch-projects/(size=${page.size}, page=${i}, reqId=${reqId})}" th:text="${i + 1}"></a></li>
+        <li class="page-item" th:classappend="${page.last} ? 'disabled'"><a class="page-link" th:href="@{/arch-projects/(size=${page.size}, page=${page.number + 1}, reqId=${reqId})}">下一页</a></li>
+        <li class="page-item" th:classappend="${page.last} ? 'disabled'"><a class="page-link" th:href="@{/arch-projects/(size=${page.size}, page=${page.totalPages - 1}, reqId=${reqId})}">尾页</a></li>
+      </ul>
+    </nav>
+  </div>
+</div>
+</body>
+</html>

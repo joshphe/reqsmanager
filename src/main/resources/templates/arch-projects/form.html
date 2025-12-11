@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${pageTitle}"></title>
+  <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+<body>
+<div class="container mt-5 mb-5">
+  <h1 th:text="${pageTitle}"></h1>
+  <hr>
+
+  <form th:action="@{/arch-projects/save}" th:object="${project}" method="post">
+
+    <input type="hidden" th:field="*{id}">
+
+    <div class="form-row">
+      <div class="form-group col-md-4"><label>项目编号</label><input type="text" th:field="*{projectNumber}" class="form-control" required></div>
+      <div class="form-group col-md-4"><label>需求编号</label><input type="text" th:field="*{reqId}" class="form-control"></div>
+      <div class="form-group col-md-4"><label>需求名称</label><input type="text" th:field="*{reqName}" class="form-control"></div>
+    </div>
+
+    <div class="form-group form-check">
+      <input type="checkbox" th:field="*{keyProject}" class="form-check-input">
+      <label class="form-check-label">是否重点项目</label>
+    </div>
+
+    <hr>
+
+    <!-- 可行性方案 -->
+    <h5>可行性方案</h5>
+    <div class="form-row">
+      <div class="form-group col-md-4"><label>递交人</label><input type="text" th:field="*{feasibilitySubmitter}" class="form-control"></div>
+      <!-- === START: 修正日期字段 === -->
+      <div class="form-group col-md-4">
+        <label>递交日期</label>
+        <input type="date" name="feasibilitySubmitDate" class="form-control"
+               th:value="${project.feasibilitySubmitDate != null ? #temporals.format(project.feasibilitySubmitDate, 'yyyy-MM-dd') : ''}">
+      </div>
+      <div class="form-group col-md-4">
+        <label>评审通过日期</label>
+        <input type="date" name="feasibilityReviewPassDate" class="form-control"
+               th:value="${project.feasibilityReviewPassDate != null ? #temporals.format(project.feasibilityReviewPassDate, 'yyyy-MM-dd') : ''}">
+      </div>
+      <!-- === END: 修正 === -->
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-2"><label>评分</label><input type="number" th:field="*{feasibilityScore}" class="form-control"></div>
+      <div class="form-group col-md-10"><label>扣分原因</label><textarea th:field="*{feasibilityDeductionReason}" class="form-control" rows="1"></textarea></div>
+    </div>
+
+    <hr>
+
+    <!-- 总体设计 -->
+    <h5>总体设计</h5>
+    <div class="form-row">
+      <div class="form-group col-md-4"><label>递交人</label><input type="text" th:field="*{generalDesignSubmitter}" class="form-control"></div>
+      <!-- === START: 修正日期字段 === -->
+      <div class="form-group col-md-4">
+        <label>递交日期</label>
+        <input type="date" name="generalDesignSubmitDate" class="form-control"
+               th:value="${project.generalDesignSubmitDate != null ? #temporals.format(project.generalDesignSubmitDate, 'yyyy-MM-dd') : ''}">
+      </div>
+      <div class="form-group col-md-4">
+        <label>评审通过日期</label>
+        <input type="date" name="generalDesignReviewPassDate" class="form-control"
+               th:value="${project.generalDesignReviewPassDate != null ? #temporals.format(project.generalDesignReviewPassDate, 'yyyy-MM-dd') : ''}">
+      </div>
+      <!-- === END: 修正 === -->
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-2"><label>评分</label><input type="number" th:field="*{generalDesignScore}" class="form-control"></div>
+      <div class="form-group col-md-10"><label>扣分原因</label><textarea th:field="*{generalDesignDeductionReason}" class="form-control" rows="1"></textarea></div>
+    </div>
+
+    <hr>
+
+    <!-- 详细设计 -->
+    <h5>详细设计</h5>
+    <div class="form-row">
+      <div class="form-group col-md-6"><label>递交人</label><input type="text" th:field="*{detailedDesignSubmitter}" class="form-control"></div>
+      <!-- === START: 修正日期字段 === -->
+      <div class="form-group col-md-6">
+        <label>递交日期</label>
+        <input type="date" name="detailedDesignSubmitDate" class="form-control"
+               th:value="${project.detailedDesignSubmitDate != null ? #temporals.format(project.detailedDesignSubmitDate, 'yyyy-MM-dd') : ''}">
+      </div>
+      <!-- === END: 修正 === -->
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-2"><label>评分</label><input type="number" th:field="*{detailedDesignScore}" class="form-control"></div>
+      <div class="form-group col-md-10"><label>扣分原因</label><textarea th:field="*{detailedDesignDeductionReason}" class="form-control" rows="1"></textarea></div>
+    </div>
+
+    <hr>
+
+    <!-- 备注 -->
+    <div class="form-group">
+      <label>备注</label>
+      <textarea th:field="*{remarks}" class="form-control" rows="3"></textarea>
+    </div>
+
+    <hr>
+
+    <!-- 操作按钮 -->
+    <button type="submit" class="btn btn-primary">保存项目信息</button>
+    <a th:href="@{/arch-projects/}" class="btn btn-secondary">取消</a>
+  </form>
+</div>
+</body>
+</html>

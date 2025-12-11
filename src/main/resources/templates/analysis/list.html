@@ -24,8 +24,8 @@
         <table class="table table-bordered table-striped">
             <thead class="thead-dark">
             <tr>
-                <th class="col-req-id col-frozen-left">需求编号</th>
-                <th class="col-req-name col-frozen-left">需求名称</th>
+                <th class="frozen col-1 col-req-id">需求编号</th>
+                <th class="frozen col-2 col-req-name">需求名称</th>
                 <th>是否需分介入</th>
                 <th>团队需分人员</th>
                 <th>需分完成日期</th>
@@ -34,7 +34,7 @@
                 <th>需规编写人员</th>
                 <th>是否需规评审</th>
                 <th>需规评审时间</th>
-                <th class="col-actions col-frozen-right">操作</th>
+                <th class="frozen col-last col-actions">操作</th>
             </tr>
             </thead>
             <tbody>
@@ -44,8 +44,8 @@
             </tr>
             <!-- 遍历数据 -->
             <tr th:each="req : ${page.content}">
-                <td class="col-req-id col-frozen-left" th:text="${req.reqId}"></td>
-                <td class="col-req-name col-frozen-left" th:text="${req.name}"></td>
+                <td class="frozen col-1 col-req-id" th:text="${req.reqId}"></td>
+                <td class="frozen col-2 col-req-name" th:text="${req.name}"></td>
                 <td th:text="${req.isAnalysisInvolved == true ? '是' : '否'}"></td>
                 <td th:text="${req.analysisMembers}"></td>
                 <td th:text="${req.analysisFinishDate != null ? #temporals.format(req.analysisFinishDate, 'yyyy-MM-dd') : ''}"></td>
@@ -55,7 +55,7 @@
                 <td th:text="${req.isSpecReviewed == true ? '是' : '否'}"></td>
                 <!-- 只修改 specReviewTime 的格式 -->
                 <td th:text="${req.specReviewTime != null ? #temporals.format(req.specReviewTime, 'yyyy-MM-dd') : ''}"></td>
-                <td class="col-actions col-frozen-right">
+                <td class="frozen col-last col-actions">
                     <a th:href="@{/analysis/edit/{id}(id=${req.id})}" class="btn btn-warning btn-sm">编辑</a>
                 </td>
             </tr>
