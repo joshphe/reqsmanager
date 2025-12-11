@@ -46,4 +46,30 @@ public class UserService {
         // 5. 保存到数据库
         return userRepository.save(newUser);
     }
+
+    // === START: 新增重置密码的方法 ===
+    /**
+     * 重置指定用户的密码.
+     * @param username 要重置密码的用户名
+     * @param newPassword 用户输入的新密码 (明文)
+     * @param verificationCode 用户输入的验证码
+     * @throws Exception 如果验证码错误或用户不存在
+     */
+    public void resetPassword(String username, String newPassword, String verificationCode) throws Exception {
+        // 1. 校验验证码
+        if (!REGISTRATION_CODE.equals(verificationCode)) {
+            throw new Exception("验证码错误！");
+        }
+
+        // 2. 从数据库中找到用户
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new Exception("用户名 '" + username + "' 不存在！"));
+
+        // 3. 将新密码加密并更新到用户对象
+        user.setPassword(passwordEncoder.encode(newPassword));
+
+        // 4. 保存更新后的用户
+        userRepository.save(user);
+    }
+    // === END: 新增 ===
 }

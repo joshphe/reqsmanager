@@ -32,6 +32,11 @@
       <label for="password">密码</label>
       <input type="password" id="password" name="password" class="form-control" required>
     </div>
+    <!-- === START: 在登录按钮和注册链接之间添加 === -->
+    <div class="text-right mb-3">
+      <a th:href="@{/forgot-password}">忘记密码?</a>
+    </div>
+    <!-- === END === -->
     <button type="submit" class="btn btn-primary btn-block">登录</button>
     <!-- === START: 新增注册入口 === -->
     <div class="text-center mt-3">

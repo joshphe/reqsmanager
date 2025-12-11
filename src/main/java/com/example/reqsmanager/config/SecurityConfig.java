@@ -42,7 +42,7 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider)
                 .authorizeHttpRequests(auth -> auth
                         // === START: 核心修正，将 /error 加入白名单 ===
-                        .requestMatchers("/login", "/register", "/error", "/css/**", "/js/**", "/webjars/**", "/favicon.ico").permitAll()
+                        .requestMatchers("/login", "/register", "/error", "/css/**", "/js/**", "/webjars/**", "/favicon.ico", "/forgot-password").permitAll()
                         // === END: 核心修正 ===
                         .anyRequest().authenticated()
                 )
