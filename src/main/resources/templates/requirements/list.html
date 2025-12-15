@@ -36,6 +36,10 @@
                 <th class="frozen col-2 col-req-name">需求名称</th>
                 <th>需求业务负责人</th>
                 <th>需求科技负责人</th>
+                <!-- === START: 新增表头 === -->
+                <th>牵头部室</th>
+                <th>需求类型</th>
+                <!-- === END: 新增表头 === -->
                 <th>业务条线</th>
                 <th>开发负责人</th>
                 <th class="col-schedule-date">需求排期</th>
@@ -53,6 +57,10 @@
                 <td class="frozen col-2 col-req-name" th:text="${req.name}"></td>
                 <td th:text="${req.businessLeader}"></td>
                 <td th:text="${req.techLeader}"></td>
+                <!-- === START: 新增数据列 === -->
+                <td th:text="${req.leadDepartment}"></td>
+                <td th:text="${req.reqType}"></td>
+                <!-- === END: 新增数据列 === -->
                 <td th:text="${req.businessLine}"></td>
                 <td th:text="${req.devLeader}"></td>
                 <td class="col-schedule-date" th:text="${req.scheduleDate != null ? #temporals.format(req.scheduleDate, 'yyyy-MM-dd') : ''}"></td>

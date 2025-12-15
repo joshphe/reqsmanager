@@ -10,6 +10,10 @@ public class RequirementGeneralDTO {
     private String name;
     private String businessLeader;
     private String techLeader;
+    // === START: 新增字段 ===
+    private String leadDepartment;
+    private String reqType;
+    // === END: 新增字段 ===
     private String businessLine;
     private String devLeader;
     private LocalDate scheduleDate;

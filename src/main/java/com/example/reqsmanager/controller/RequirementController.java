@@ -71,6 +71,10 @@ public class RequirementController {
         dto.setName(req.getName());
         dto.setBusinessLeader(req.getBusinessLeader());
         dto.setTechLeader(req.getTechLeader());
+        // === START: 新增字段的映射 ===
+        dto.setLeadDepartment(req.getLeadDepartment());
+        dto.setReqType(req.getReqType());
+        // === END: 新增 ===
         dto.setBusinessLine(req.getBusinessLine());
         dto.setDevLeader(req.getDevLeader());
         dto.setScheduleDate(req.getScheduleDate());

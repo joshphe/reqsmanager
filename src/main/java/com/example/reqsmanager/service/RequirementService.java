@@ -107,6 +107,11 @@ public class RequirementService {
         req.setName(dto.getName());
         req.setBusinessLeader(dto.getBusinessLeader());
         req.setTechLeader(dto.getTechLeader());
+        // === START: 新增字段的设置 ===
+        req.setLeadDepartment(dto.getLeadDepartment());
+        req.setReqType(dto.getReqType());
+        // === END: 新增 ===
+
         req.setBusinessLine(dto.getBusinessLine());
         req.setDevLeader(dto.getDevLeader());
         req.setScheduleDate(dto.getScheduleDate());
@@ -136,6 +141,10 @@ public class RequirementService {
         // 注意：reqId 和 name 在编辑时通常是只读的，这里不进行更新
         requirement.setBusinessLeader(dto.getBusinessLeader());
         requirement.setTechLeader(dto.getTechLeader());
+        // === START: 新增字段的设置 ===
+        requirement.setLeadDepartment(dto.getLeadDepartment());
+        requirement.setReqType(dto.getReqType());
+        // === END: 新增 ===
         requirement.setBusinessLine(dto.getBusinessLine());
         requirement.setDevLeader(dto.getDevLeader());
         requirement.setScheduleDate(dto.getScheduleDate());
