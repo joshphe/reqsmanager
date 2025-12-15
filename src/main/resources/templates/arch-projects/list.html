@@ -34,6 +34,10 @@
         <th class="frozen col-1 col-project-number">项目编号</th>
         <th class="frozen col-2 col-req-id">需求编号</th>
         <th class="frozen col-3 col-req-name">需求名称</th>
+        <!-- 2025-12-15 新增项目所属开发部室、项目负责人 === START: 新增表头 === -->
+        <th>开发部室</th>
+        <th>项目负责人</th>
+        <!-- === END: 新增表头 === -->
         <th>是否重点项目</th>
         <th>可行性方案递交人</th>
         <th>可行性方案递交日期</th>
@@ -61,6 +65,10 @@
         <td class="frozen col-1 col-project-number" th:text="${proj.projectNumber}"></td>
         <td class="frozen col-2 col-req-id" th:text="${proj.reqId}"></td>
         <td class="frozen col-3 col-req-name" th:text="${proj.reqName}"></td>
+        <!-- === START: 新增数据列 === -->
+        <td th:text="${proj.devDepartment}"></td>
+        <td th:text="${proj.projectManager}"></td>
+        <!-- === END: 新增数据列 === -->
         <td th:text="${proj.keyProject ? '是' : '否'}"></td>
         <td th:text="${proj.feasibilitySubmitter}"></td>
 

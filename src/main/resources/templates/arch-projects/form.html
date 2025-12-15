@@ -19,7 +19,18 @@
       <div class="form-group col-md-4"><label>需求编号</label><input type="text" th:field="*{reqId}" class="form-control"></div>
       <div class="form-group col-md-4"><label>需求名称</label><input type="text" th:field="*{reqName}" class="form-control"></div>
     </div>
-
+    <!-- === START: 新增输入框 === -->
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label>开发部室</label>
+        <input type="text" th:field="*{devDepartment}" class="form-control">
+      </div>
+      <div class="form-group col-md-6">
+        <label>项目负责人</label>
+        <input type="text" th:field="*{projectManager}" class="form-control">
+      </div>
+    </div>
+    <!-- === END: 新增输入框 === -->
     <div class="form-group form-check">
       <input type="checkbox" th:field="*{keyProject}" class="form-check-input">
       <label class="form-check-label">是否重点项目</label>

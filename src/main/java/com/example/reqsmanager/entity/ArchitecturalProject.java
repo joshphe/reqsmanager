@@ -22,6 +22,14 @@ public class ArchitecturalProject {
     @Column(length = 200, columnDefinition = "VARCHAR(200) COMMENT '需求名称'")
     private String reqName;
 
+    // === START: 新增字段 ===
+    @Column(length = 100, columnDefinition = "VARCHAR(100) COMMENT '开发部室'")
+    private String devDepartment;
+
+    @Column(length = 50, columnDefinition = "VARCHAR(50) COMMENT '项目负责人'")
+    private String projectManager;
+    // === END: 新增字段 ===
+
     // === START: 修正此处的字段命名 ===
     /**
      *  字段名从 isKeyProject 修改为 keyProject
