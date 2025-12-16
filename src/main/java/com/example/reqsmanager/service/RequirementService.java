@@ -110,6 +110,9 @@ public class RequirementService {
         req.setTechLeader(dto.getTechLeader());
         // === START: 新增字段的设置 ===
         req.setLeadDepartment(dto.getLeadDepartment());
+        // === START: 新增 ===
+        req.setGroupName(dto.getGroupName());
+        // === END ===
         req.setReqType(dto.getReqType());
         // === END: 新增 ===
 
@@ -149,6 +152,9 @@ public class RequirementService {
         requirement.setTechLeader(dto.getTechLeader());
         // === START: 新增字段的设置 ===
         requirement.setLeadDepartment(dto.getLeadDepartment());
+        // === START: 新增 ===
+        requirement.setGroupName(dto.getGroupName());
+        // === END ===
         requirement.setReqType(dto.getReqType());
         // === END: 新增 ===
         requirement.setBusinessLine(dto.getBusinessLine());

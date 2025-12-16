@@ -38,6 +38,9 @@
                 <th>需求科技负责人</th>
                 <!-- === START: 新增表头 === -->
                 <th>牵头部室</th>
+                <!-- === START: 新增表头 === -->
+                <th>所属小组</th>
+                <!-- === END: 新增表头 === -->
                 <th>需求类型</th>
                 <!-- === END: 新增表头 === -->
                 <th>业务条线</th>
@@ -59,6 +62,9 @@
                 <td th:text="${req.techLeader}"></td>
                 <!-- === START: 新增数据列 === -->
                 <td th:text="${req.leadDepartment}"></td>
+                <!-- === START: 新增数据列 === -->
+                <td th:text="${req.groupName}"></td>
+                <!-- === END: 新增数据列 === -->
                 <td th:text="${req.reqType}"></td>
                 <!-- === END: 新增数据列 === -->
                 <td th:text="${req.businessLine}"></td>

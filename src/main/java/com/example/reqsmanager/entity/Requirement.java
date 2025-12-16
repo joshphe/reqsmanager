@@ -44,13 +44,16 @@ public class Requirement {
     @Column(length = 50, columnDefinition = "VARCHAR(50) COMMENT '需求科技负责人'")
     private String techLeader;
 
-    // === START: 新增字段 ===
     @Column(length = 100, columnDefinition = "VARCHAR(100) COMMENT '牵头部室'")
     private String leadDepartment;
 
+    // === START: 新增字段 ===
+    @Column(length = 100, columnDefinition = "VARCHAR(100) COMMENT '所属小组'")
+    private String groupName;
+    // === END: 新增字段 ===
+
     @Column(length = 50, columnDefinition = "VARCHAR(50) COMMENT '需求类型'")
     private String reqType;
-    // === END: 新增字段 ===
 
     /**
      * 业务条线

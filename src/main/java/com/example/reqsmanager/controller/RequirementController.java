@@ -73,6 +73,9 @@ public class RequirementController {
         dto.setTechLeader(req.getTechLeader());
         // === START: 新增字段的映射 ===
         dto.setLeadDepartment(req.getLeadDepartment());
+        // === START: 新增 ===
+        dto.setGroupName(req.getGroupName());
+        // === END ===
         dto.setReqType(req.getReqType());
         // === END: 新增 ===
         dto.setBusinessLine(req.getBusinessLine());
