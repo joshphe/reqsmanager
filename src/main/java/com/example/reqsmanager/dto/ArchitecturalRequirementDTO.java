@@ -32,4 +32,16 @@ public class ArchitecturalRequirementDTO {
     private String summaryDesignDeductionReason;
     private Integer detailedDesignScore;
     private String detailedDesignDeductionReason;
+
+
+    // ReviewInfo 的 ID，非常重要
+    private Integer reviewInfoId;
+
+    // 评审信息
+    private Boolean reviewCheck1, reviewCheck2, reviewCheck3, reviewCheck4, reviewCheck5, reviewCheck6, reviewCheck7, reviewCheck8, reviewCheck9;
+    private String reviewLevel;
+
+    // 架构检核
+    private Boolean auditCheck1, auditCheck2, auditCheck3, auditCheck4, auditCheck5, auditCheck6, auditCheck7, auditCheck8, auditCheck9;
+    private String auditLevel;
 }

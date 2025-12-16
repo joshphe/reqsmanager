@@ -6,6 +6,7 @@ import com.example.reqsmanager.dto.RequirementGeneralDTO;
 import com.example.reqsmanager.dto.RequirementExportDTO;
 import com.example.reqsmanager.entity.ArchitecturalRequirement;
 import com.example.reqsmanager.entity.Requirement;
+import com.example.reqsmanager.entity.ReviewInfo;
 import com.example.reqsmanager.repository.ArchitecturalRequirementRepository;
 import com.example.reqsmanager.repository.RequirementRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,6 +120,11 @@ public class RequirementService {
         // 创建一个空的、关联的架构需求对象
         ArchitecturalRequirement archReq = new ArchitecturalRequirement();
         archReq.setRequirement(req); // 建立关联：将主需求设置到架构需求中
+        // === 新增：级联创建 ReviewInfo ===
+        ReviewInfo reviewInfo = new ReviewInfo();
+        archReq.setReviewInfo(reviewInfo);
+        // reviewInfo.setArchitecturalRequirement(archReq); // 如果是双向关联，也设置反向引用
+        // === 结束 ===
         req.setArchitecturalRequirement(archReq); // 建立关联：将架构需求设置到主需求中
 
         // 由于在 Requirement 实体中设置了 CascadeType.ALL,
@@ -193,12 +199,12 @@ public class RequirementService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid architectural requirement Id: " + dto.getId()));
 
         // 2. 从 DTO 完整地复制所有可编辑字段到实体
-        archReq.setIsImportantRequirement(dto.getImportantRequirement());
-        archReq.setIsSummaryDesignSubmitted(dto.getSummaryDesignSubmitted());
+        archReq.setImportantRequirement(dto.getImportantRequirement());
+        archReq.setSummaryDesignSubmitted(dto.getSummaryDesignSubmitted());
         archReq.setSummaryDesignSubmitter(dto.getSummaryDesignSubmitter());
         archReq.setSummaryDesignSubmitDate(dto.getSummaryDesignSubmitDate());
         archReq.setSummaryDesignReviewPassDate(dto.getSummaryDesignReviewPassDate());
-        archReq.setIsDetailedDesignSubmitted(dto.getDetailedDesignSubmitted());
+        archReq.setDetailedDesignSubmitted(dto.getDetailedDesignSubmitted());
         archReq.setDetailedDesignSubmitter(dto.getDetailedDesignSubmitter());
         archReq.setDetailedDesignSubmitDate(dto.getDetailedDesignSubmitDate());
         archReq.setInvolvesArchDecision(dto.getInvolvesArchDecision());
@@ -251,12 +257,12 @@ public class RequirementService {
         // 2. 映射关联的架构需求信息 (进行空指针安全检查)
         ArchitecturalRequirement archReq = req.getArchitecturalRequirement();
         if (archReq != null) {
-            dto.setIsImportantRequirement(archReq.getIsImportantRequirement());
-            dto.setIsSummaryDesignSubmitted(archReq.getIsSummaryDesignSubmitted());
+            dto.setIsImportantRequirement(archReq.getImportantRequirement());
+            dto.setIsSummaryDesignSubmitted(archReq.getSummaryDesignSubmitted());
             dto.setSummaryDesignSubmitter(archReq.getSummaryDesignSubmitter());
             dto.setSummaryDesignSubmitDate(archReq.getSummaryDesignSubmitDate());
             dto.setSummaryDesignReviewPassDate(archReq.getSummaryDesignReviewPassDate());
-            dto.setIsDetailedDesignSubmitted(archReq.getIsDetailedDesignSubmitted());
+            dto.setIsDetailedDesignSubmitted(archReq.getDetailedDesignSubmitted());
             dto.setDetailedDesignSubmitter(archReq.getDetailedDesignSubmitter());
             dto.setDetailedDesignSubmitDate(archReq.getDetailedDesignSubmitDate());
             dto.setInvolvesArchDecision(archReq.getInvolvesArchDecision());
@@ -270,4 +276,5 @@ public class RequirementService {
 
         return dto;
     }
+
 }

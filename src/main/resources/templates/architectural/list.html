@@ -12,19 +12,19 @@
     <!-- 筛选表单 -->
     <div class="mb-3">
         <form th:action="@{/architectural/}" method="get" class="form-inline">
-            <input type="text" name="reqId" th:value="${reqId}" placeholder="输入需求编号筛选" class="form-control mr-2">
+            <input type="text" name="reqId" th:value="${reqId}" placeholder="按需求编号筛选" class="form-control mr-2">
             <input type="hidden" name="size" th:value="${page.size}">
             <button type="submit" class="btn btn-primary">筛选</button>
             <a th:href="@{/architectural/}" class="btn btn-secondary ml-2">清空筛选</a>
         </form>
     </div>
 
-    <!-- 表格 -->
+    <!-- 表格容器 -->
     <div class="table-responsive">
         <table class="table table-bordered table-striped">
             <thead class="thead-dark">
             <tr>
-                <!-- 固定列 -->
+                <!-- 固定列 (左) -->
                 <th class="frozen col-1 col-req-id">需求编号</th>
                 <th class="frozen col-2 col-req-name">需求名称</th>
                 <!-- 滚动列 -->
@@ -43,7 +43,10 @@
                 <th>概要设计扣分原因</th>
                 <th>详细设计评分</th>
                 <th>详细设计扣分原因</th>
-                <!-- 固定列 -->
+                <!-- === START: 新增表头 === -->
+                <th>评审检核是否一致</th>
+                <!-- === END === -->
+                <!-- 固定列 (右) -->
                 <th class="frozen col-last col-actions">操作</th>
             </tr>
             </thead>
@@ -52,29 +55,93 @@
                 <td colspan="18" class="text-center">没有找到相关需求</td>
             </tr>
             <tr th:each="req : ${page.content}">
-                <!-- 固定列 -->
+                <!-- 固定列 (左) -->
                 <td class="frozen col-1 col-req-id" th:text="${req.reqId}"></td>
                 <td class="frozen col-2 col-req-name" th:text="${req.name}"></td>
-                <!-- 滚动列 - 通过 req.architecturalRequirement 访问关联对象 -->
-                <td th:text="${req.architecturalRequirement?.isImportantRequirement == true ? '是' : '否'}"></td>
-                <td th:text="${req.architecturalRequirement?.isSummaryDesignSubmitted == true ? '是' : '否'}"></td>
+                <!-- 滚动列 -->
+                <td>
+                    <span th:if="${req.architecturalRequirement?.ImportantRequirement == false}">
+                        否
+                    </span>
+                    <span th:unless="${req.architecturalRequirement?.ImportantRequirement == false}"
+                          style="color: red; font-weight: bold;">
+                        是
+                    </span>
+                </td>
+                <td>
+                    <span th:if="${req.architecturalRequirement?.SummaryDesignSubmitted == false}"
+                          style="color: red; font-weight: bold;">
+                        否
+                    </span>
+                    <!-- 如果一致 (areReviewsConsistent == true 或为 null) -->
+                    <span th:unless="${req.architecturalRequirement?.SummaryDesignSubmitted == false}">
+                        是
+                    </span>
+                </td>
                 <td th:text="${req.architecturalRequirement?.summaryDesignSubmitter}"></td>
                 <td th:text="${req.architecturalRequirement?.summaryDesignSubmitDate != null ? #temporals.format(req.architecturalRequirement.summaryDesignSubmitDate, 'yyyy-MM-dd') : ''}"></td>
                 <td th:text="${req.architecturalRequirement?.summaryDesignReviewPassDate != null ? #temporals.format(req.architecturalRequirement.summaryDesignReviewPassDate, 'yyyy-MM-dd') : ''}"></td>
-                <td th:text="${req.architecturalRequirement?.isDetailedDesignSubmitted == true ? '是' : '否'}"></td>
+                <td>
+                    <span th:if="${req.architecturalRequirement?.DetailedDesignSubmitted == false}"
+                          style="color: red; font-weight: bold;">
+                        否
+                    </span>
+                    <!-- 如果一致 (areReviewsConsistent == true 或为 null) -->
+                    <span th:unless="${req.architecturalRequirement?.DetailedDesignSubmitted == false}">
+                        是
+                    </span>
+                </td>
                 <td th:text="${req.architecturalRequirement?.detailedDesignSubmitter}"></td>
                 <td th:text="${req.architecturalRequirement?.detailedDesignSubmitDate != null ? #temporals.format(req.architecturalRequirement.detailedDesignSubmitDate, 'yyyy-MM-dd') : ''}"></td>
-                <td th:text="${req.architecturalRequirement?.involvesArchDecision == true ? '是' : '否'}"></td>
-                <td th:text="${req.architecturalRequirement?.involvesInfra == true ? '是' : '否'}"></td>
-                <td th:text="${req.architecturalRequirement?.involvesSeniorReport == true ? '是' : '否'}"></td>
+                <td>
+                    <span th:if="${req.architecturalRequirement?.involvesArchDecision == false}">
+                        否
+                    </span>
+                    <!-- 如果一致 (areReviewsConsistent == true 或为 null) -->
+                    <span th:unless="${req.architecturalRequirement?.involvesArchDecision == false}"
+                          style="color: red; font-weight: bold;">
+                        是
+                    </span>
+                </td>
+                <td>
+                    <span th:if="${req.architecturalRequirement?.involvesInfra == false}">
+                        否
+                    </span>
+                    <!-- 如果一致 (areReviewsConsistent == true 或为 null) -->
+                    <span th:unless="${req.architecturalRequirement?.involvesInfra == false}"
+                          style="color: red; font-weight: bold;">
+                        是
+                    </span>
+                </td>
+                <td>
+                    <span th:if="${req.architecturalRequirement?.involvesSeniorReport == false}">
+                        否
+                    </span>
+                    <!-- 如果一致 (areReviewsConsistent == true 或为 null) -->
+                    <span th:unless="${req.architecturalRequirement?.involvesSeniorReport == false}"
+                          style="color: red; font-weight: bold;">
+                        是
+                    </span>
+                </td>
                 <td th:text="${req.architecturalRequirement?.summaryDesignScore}"></td>
                 <td th:text="${req.architecturalRequirement?.summaryDesignDeductionReason}"></td>
                 <td th:text="${req.architecturalRequirement?.detailedDesignScore}"></td>
                 <td th:text="${req.architecturalRequirement?.detailedDesignDeductionReason}"></td>
-                <!-- 固定列 -->
+                <td>
+                    <!-- 如果不一致 (areReviewsConsistent == false) -->
+                    <span th:if="${req.architecturalRequirement?.areReviewsConsistent == false}"
+                          style="color: red; font-weight: bold;">
+                        否
+                    </span>
+                    <!-- 如果一致 (areReviewsConsistent == true 或为 null) -->
+                    <span th:unless="${req.architecturalRequirement?.areReviewsConsistent == false}">
+                        是
+                    </span>
+                </td>
+                <!-- === END === -->
+                <!-- 固定列 (右) -->
                 <td class="frozen col-last col-actions">
-                    <!-- 编辑链接指向主需求的 ID -->
-                    <a th:href="@{/architectural/edit/{id}(id=${req.id})}" class="btn btn-warning btn-sm">编辑</a>
+                    <a th:href="@{/architectural/edit/{id}(id=${req.id})}" class="btn btn-warning btn-sm ml-1">详情 / 编辑</a>
                 </td>
             </tr>
             </tbody>

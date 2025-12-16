@@ -21,10 +21,10 @@ public class ArchitecturalRequirement {
     // --- 新增的业务字段 ---
 
     @Column(columnDefinition = "BIT(1) COMMENT '是否重要需求'")
-    private Boolean isImportantRequirement = false;
+    private Boolean importantRequirement = false;
 
     @Column(columnDefinition = "BIT(1) COMMENT '是否递交概要设计'")
-    private Boolean isSummaryDesignSubmitted = false;
+    private Boolean summaryDesignSubmitted = false;
 
     @Column(length = 50, columnDefinition = "VARCHAR(50) COMMENT '概要设计递交人'")
     private String summaryDesignSubmitter;
@@ -36,7 +36,7 @@ public class ArchitecturalRequirement {
     private LocalDate summaryDesignReviewPassDate;
 
     @Column(columnDefinition = "BIT(1) COMMENT '是否递交详细设计'")
-    private Boolean isDetailedDesignSubmitted = false;
+    private Boolean detailedDesignSubmitted = false;
 
     @Column(length = 50, columnDefinition = "VARCHAR(50) COMMENT '详细设计递交人'")
     private String detailedDesignSubmitter;
@@ -64,4 +64,21 @@ public class ArchitecturalRequirement {
 
     @Column(columnDefinition = "TEXT COMMENT '详细设计扣分原因'")
     private String detailedDesignDeductionReason;
+
+    // === START: 核心修改 ===
+    /**
+     * 与评审信息建立一对一关联。
+     * CascadeType.ALL: 级联所有操作。
+     * orphanRemoval = true: 当解除关联时，自动删除孤立的 ReviewInfo 记录。
+     */
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JoinColumn(name = "review_info_id", referencedColumnName = "id")
+    private ReviewInfo reviewInfo;
+
+    /**
+     * 评审与检核信息是否一致。
+     * 这个值由后端业务逻辑在保存时自动计算和设置。
+     */
+    @Column(columnDefinition = "BIT(1) DEFAULT b'1' COMMENT '评审检核是否一致'")
+    private Boolean areReviewsConsistent = true;
 }

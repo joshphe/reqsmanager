@@ -2,18 +2,26 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>编辑架构需求信息</title>
-    <!-- 使用本地 CSS 链接 -->
+    <title th:text="${pageTitle}">架构需求详情与维护</title>
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
 </head>
 <body>
 <div class="container mt-5 mb-5">
-    <h1>编辑架构需求信息</h1>
+    <h1 th:text="${pageTitle}"></h1>
     <hr>
+
+    <!-- 表单绑定到大而全的 ArchitecturalRequirementDTO -->
     <form th:action="@{/architectural/save}" th:object="${dto}" method="post">
+
+        <!-- 所有需要的 ID 都作为隐藏域提交 -->
         <input type="hidden" th:field="*{id}">
         <input type="hidden" th:field="*{requirementId}">
+        <input type="hidden" th:field="*{reviewInfoId}">
 
+        <!-- ================================== -->
+        <!-- ======  一、需求信息介绍 (只读) ====== -->
+        <!-- ================================== -->
+        <h5>一、需求信息介绍</h5>
         <div class="form-group row">
             <label class="col-sm-3 col-form-label font-weight-bold">需求编号</label>
             <div class="col-sm-9"><input type="text" th:field="*{reqId}" class="form-control-plaintext" readonly></div>
@@ -25,21 +33,74 @@
 
         <hr>
 
-        <!-- 是/否 类型的字段 (th:field 对 checkbox 支持良好) -->
-        <div class="form-row mb-3">
-            <div class="col-auto"><div class="form-check">
-                <input type="checkbox" th:field="*{importantRequirement}" class="form-check-input">
-                <label class="form-check-label">是否重要需求</label>
-            </div></div>
-            <div class="col-auto"><div class="form-check">
-                <input type="checkbox" th:field="*{summaryDesignSubmitted}" class="form-check-input">
-                <label class="form-check-label">是否递交概要设计</label>
-            </div></div>
-            <div class="col-auto"><div class="form-check">
-                <input type="checkbox" th:field="*{detailedDesignSubmitted}" class="form-check-input">
-                <label class="form-check-label">是否递交详细设计</label>
-            </div></div>
+        <!-- ========================================== -->
+        <!-- ======  二、架构需求核心信息 (可编辑)  ====== -->
+        <!-- ========================================== -->
+        <h5>二、架构需求核心信息</h5>
+        <div class="form-group form-check">
+            <input type="checkbox" th:field="*{importantRequirement}" class="form-check-input">
+            <label class="form-check-label">是否重要需求</label>
         </div>
+        <div class="form-check mb-3">
+            <input type="checkbox" th:field="*{summaryDesignSubmitted}" class="form-check-input">
+            <label class="form-check-label">是否递交概要设计</label>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6"><label>概要设计递交人</label><input type="text" th:field="*{summaryDesignSubmitter}" class="form-control"></div>
+            <!-- === START: 修正此处的日期输入框 === -->
+            <div class="form-group col-md-6">
+                <label>概要设计递交日期</label>
+                <input type="date" name="summaryDesignSubmitDate" class="form-control"
+                       th:value="${dto.summaryDesignSubmitDate != null ? #temporals.format(dto.summaryDesignSubmitDate, 'yyyy-MM-dd') : ''}">
+            </div>
+            <!-- === END: 修正 === -->
+        </div>
+
+        <!-- === END === -->
+        <!-- === START: 修正此处的日期输入框 === -->
+        <div class="form-group">
+            <label>概要设计评审通过日期</label>
+            <input type="date" name="summaryDesignReviewPassDate" class="form-control"
+                   th:value="${dto.summaryDesignReviewPassDate != null ? #temporals.format(dto.summaryDesignReviewPassDate, 'yyyy-MM-dd') : ''}">
+        </div>
+        <!-- === START: 补全概要设计评分和扣分原因 === -->
+        <div class="form-row">
+            <div class="form-group col-md-2">
+                <label>概要设计评分</label>
+                <input type="number" th:field="*{summaryDesignScore}" class="form-control">
+            </div>
+            <div class="form-group col-md-10">
+                <label>概要设计扣分原因</label>
+                <textarea th:field="*{summaryDesignDeductionReason}" class="form-control" rows="1"></textarea>
+            </div>
+        </div>
+        <!-- === END: 修正 === -->
+        <div class="form-check mb-3">
+            <input type="checkbox" th:field="*{detailedDesignSubmitted}" class="form-check-input">
+            <label class="form-check-label">是否递交详细设计</label>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6"><label>详细设计递交人</label><input type="text" th:field="*{detailedDesignSubmitter}" class="form-control"></div>
+            <!-- === START: 修正此处的日期输入框 === -->
+            <div class="form-group col-md-6">
+                <label>详细设计递交日期</label>
+                <input type="date" name="detailedDesignSubmitDate" class="form-control"
+                       th:value="${dto.detailedDesignSubmitDate != null ? #temporals.format(dto.detailedDesignSubmitDate, 'yyyy-MM-dd') : ''}">
+            </div>
+        </div>
+        <!-- === START: 补全详细设计评分和扣分原因 === -->
+        <div class="form-row">
+            <div class="form-group col-md-2">
+                <label>详细设计评分</label>
+                <input type="number" th:field="*{detailedDesignScore}" class="form-control">
+            </div>
+            <div class="form-group col-md-10">
+                <label>详细设计扣分原因</label>
+                <textarea th:field="*{detailedDesignDeductionReason}" class="form-control" rows="1"></textarea>
+            </div>
+        </div>
+
+        <!-- === START: 补全缺失的 Checkbox 字段 === -->
         <div class="form-row mb-3">
             <div class="col-auto"><div class="form-check">
                 <input type="checkbox" th:field="*{involvesArchDecision}" class="form-check-input">
@@ -54,73 +115,120 @@
                 <label class="form-check-label">是否涉及高阶汇报</label>
             </div></div>
         </div>
-
+        <!-- === END === -->
         <hr>
 
-        <!-- 概要设计相关 -->
-        <h5>概要设计</h5>
-        <div class="form-row">
-            <div class="form-group col-md-4">
-                <label>概要设计递交人</label>
-                <input type="text" th:field="*{summaryDesignSubmitter}" class="form-control">
-            </div>
-            <!-- === START: 修正此处的日期输入框 === -->
-            <div class="form-group col-md-4">
-                <label>概要设计递交日期</label>
-                <input type="date" name="summaryDesignSubmitDate" class="form-control"
-                       th:value="${dto.summaryDesignSubmitDate != null ? #temporals.format(dto.summaryDesignSubmitDate, 'yyyy-MM-dd') : ''}">
-            </div>
-            <div class="form-group col-md-4">
-                <label>概要设计评审通过日期</label>
-                <input type="date" name="summaryDesignReviewPassDate" class="form-control"
-                       th:value="${dto.summaryDesignReviewPassDate != null ? #temporals.format(dto.summaryDesignReviewPassDate, 'yyyy-MM-dd') : ''}">
-            </div>
-            <!-- === END: 修正此处的日期输入框 === -->
+        <!-- ================================== -->
+        <!-- ======  三、评审信息 (可编辑)  ====== -->
+        <!-- ================================== -->
+        <h5>三、评审信息 (批次涉及内容)</h5>
+        <div class="form-group review-group">
+            <div class="form-check"><input class="form-check-input" type="checkbox" th:field="*{reviewCheck1}"> <label>1. 新增/变更应用或者模块</label></div>
+            <div class="form-check"><input class="form-check-input" type="checkbox" th:field="*{reviewCheck2}"> <label>2. 交易线变更</label></div>
+            <div class="form-check"><input class="form-check-input" type="checkbox" th:field="*{reviewCheck3}"> <label>3. 数据线变更</label></div>
+            <div class="form-check"><input class="form-check-input" type="checkbox" th:field="*{reviewCheck4}"> <label>4. 新增或变更关键业务场景</label></div>
+            <div class="form-check"><input class="form-check-input" type="checkbox" th:field="*{reviewCheck5}"> <label>5. 非功能变更</label></div>
+            <div class="form-check"><input class="form-check-input" type="checkbox" th:field="*{reviewCheck6}"> <label>6. 架构决策事项</label></div>
+            <div class="form-check"><input class="form-check-input" type="checkbox" th:field="*{reviewCheck7}"> <label>7. 专利、文章及标准</label></div>
+            <div class="form-check"><input class="form-check-input" type="checkbox" th:field="*{reviewCheck8}"> <label>8. 特定第三方产品或解决方案引入</label></div>
+            <div class="form-check mt-2"><input class="form-check-input" type="checkbox" th:field="*{reviewCheck9}"> <label>9. 以上均不涉及</label></div>
         </div>
-        <div class="form-row">
-            <div class="form-group col-md-2">
-                <label>概要设计评分</label>
-                <input type="number" th:field="*{summaryDesignScore}" class="form-control">
-            </div>
-            <div class="form-group col-md-10">
-                <label>概要设计扣分原因</label>
-                <textarea th:field="*{summaryDesignDeductionReason}" class="form-control" rows="1"></textarea>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label font-weight-bold">评审级别:</label>
+            <div class="col-sm-9">
+                <input type="text" th:field="*{reviewLevel}" class="form-control-plaintext review-level-display" readonly>
             </div>
         </div>
 
         <hr>
 
-        <!-- 详细设计相关 -->
-        <h5>详细设计</h5>
-        <div class="form-row">
-            <div class="form-group col-md-6">
-                <label>详细设计递交人</label>
-                <input type="text" th:field="*{detailedDesignSubmitter}" class="form-control">
-            </div>
-            <!-- === START: 修正此处的日期输入框 === -->
-            <div class="form-group col-md-6">
-                <label>详细设计递交日期</label>
-                <input type="date" name="detailedDesignSubmitDate" class="form-control"
-                       th:value="${dto.detailedDesignSubmitDate != null ? #temporals.format(dto.detailedDesignSubmitDate, 'yyyy-MM-dd') : ''}">
-            </div>
-            <!-- === END: 修正此处的日期输入框 === -->
+        <!-- ======================================= -->
+        <!-- ======  四、架构检核评审信息 (可编辑)  ====== -->
+        <!-- ======================================= -->
+        <h5>四、架构检核评审信息</h5>
+        <div class="form-group audit-group">
+            <div class="form-check"><input class="form-check-input" type="checkbox" th:field="*{auditCheck1}"> <label>1. 新增/变更应用或者模块</label></div>
+            <div class="form-check"><input class="form-check-input" type="checkbox" th:field="*{auditCheck2}"> <label>2. 交易线变更</label></div>
+            <div class="form-check"><input class="form-check-input" type="checkbox" th:field="*{auditCheck3}"> <label>3. 数据线变更</label></div>
+            <div class="form-check"><input class="form-check-input" type="checkbox" th:field="*{auditCheck4}"> <label>4. 新增或变更关键业务场景</label></div>
+            <div class="form-check"><input class="form-check-input" type="checkbox" th:field="*{auditCheck5}"> <label>5. 非功能变更</label></div>
+            <div class="form-check"><input class="form-check-input" type="checkbox" th:field="*{auditCheck6}"> <label>6. 架构决策事项</label></div>
+            <div class="form-check"><input class="form-check-input" type="checkbox" th:field="*{auditCheck7}"> <label>7. 专利、文章及标准</label></div>
+            <div class="form-check"><input class="form-check-input" type="checkbox" th:field="*{auditCheck8}"> <label>8. 特定第三方产品或解决方案引入</label></div>
+            <div class="form-check mt-2"><input class="form-check-input" type="checkbox" th:field="*{auditCheck9}"> <label>9. 以上均不涉及</label></div>
         </div>
-        <div class="form-row">
-            <div class="form-group col-md-2">
-                <label>详细设计评分</label>
-                <input type="number" th:field="*{detailedDesignScore}" class="form-control">
-            </div>
-            <div class="form-group col-md-10">
-                <label>详细设计扣分原因</label>
-                <textarea th:field="*{detailedDesignDeductionReason}" class="form-control" rows="1"></textarea>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label font-weight-bold">评审级别:</label>
+            <div class="col-sm-9">
+                <input type="text" th:field="*{auditLevel}" class="form-control-plaintext audit-level-display" readonly>
             </div>
         </div>
-
-        <hr>
-
-        <button type="submit" class="btn btn-primary">保存架构信息</button>
-        <a th:href="@{/architectural/}" class="btn btn-secondary">取消</a>
+        <button type="submit" class="btn btn-primary">保存所有信息</button>
+        <a th:href="@{/architectural/}" class="btn btn-secondary">返回列表</a>
     </form>
 </div>
+
+<!-- 引入 jQuery，因为动态计算逻辑需要它 -->
+<script th:src="@{/js/jquery-3.7.1.slim.min.js}"></script>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    (function($) {
+        if (typeof $ === 'undefined') {
+            console.error('jQuery is not loaded! Dynamic features will not work.');
+            return;
+        }
+
+        $(document).ready(function() {
+            // 页面加载时，立即执行一次计算和比对
+            calculateLevel('.review-group');
+            calculateLevel('.audit-group');
+
+            // 绑定事件
+            $('.review-group input[type=checkbox]').on('change', function() {
+                handleCheckboxLogic('.review-group', this);
+                calculateLevel('.review-group');
+            });
+
+            $('.audit-group input[type=checkbox]').on('change', function() {
+                handleCheckboxLogic('.audit-group', this);
+                calculateLevel('.audit-group');
+            });
+
+            function handleCheckboxLogic(groupSelector, checkbox) {
+                var $group = $(groupSelector);
+                var $checkbox = $(checkbox);
+                var fieldName = $checkbox.attr('th:field') || $checkbox.attr('name');
+
+                if (fieldName.endsWith('Check9') && $checkbox.is(':checked')) {
+                    $group.find('input[type=checkbox]').not($checkbox).prop('checked', false);
+                } else if ($checkbox.is(':checked')) {
+                    $group.find('input[th\\:field*="Check9"], input[name*="Check9"]').prop('checked', false);
+                }
+            }
+
+            function calculateLevel(groupSelector) {
+                var $group = $(groupSelector);
+                var displaySelector = groupSelector === '.review-group' ? 'input[name="reviewLevel"]' : 'input[name="auditLevel"]';
+                var $display = $(displaySelector);
+                var count = $group.find('input[type=checkbox]:lt(8):checked').length;
+
+                var level;
+                if ($group.find('input[th\\:field*="Check9"], input[name*="Check9"]').is(':checked')) {
+                    level = '无需评审';
+                } else if (count >= 3) {
+                    level = '线下评审';
+                } else if (count > 0) {
+                    level = '科室评审';
+                } else {
+                    level = ''; // 如果一项都没选，则级别为空
+                }
+                $display.val(level);
+            }
+        });
+    })(jQuery);
+    /*]]>*/
+</script>
+
 </body>
 </html>
