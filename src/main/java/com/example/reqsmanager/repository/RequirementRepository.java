@@ -1,5 +1,6 @@
 package com.example.reqsmanager.repository;
 
+import com.example.reqsmanager.dto.GroupMetricsDTO;
 import com.example.reqsmanager.entity.Requirement;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -7,7 +8,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface RequirementRepository extends JpaRepository<Requirement, Integer>, JpaSpecificationExecutor<Requirement> {
@@ -23,4 +27,23 @@ public interface RequirementRepository extends JpaRepository<Requirement, Intege
     @EntityGraph(attributePaths = {"architecturalRequirement"})
     Page<Requirement> findAll(Specification<Requirement> spec, Pageable pageable);
 
+    // === START: 修正此处的 JPQL 查询 ===
+    /**
+     * 按“所属小组”(groupName)分组，统计各项指标。
+     */
+    @Query("SELECT new com.example.reqsmanager.dto.GroupMetricsDTO(" +
+            "r.groupName, " +
+            "COUNT(r.id), " +
+            // 将 ar.isSummaryDesignSubmitted 改为 ar.summaryDesignSubmitted
+            "SUM(CASE WHEN ar.summaryDesignSubmitted = true THEN 1 ELSE 0 END), " +
+            "AVG(CASE WHEN ar.summaryDesignScore IS NOT NULL THEN ar.summaryDesignScore ELSE NULL END), " +
+            // 将 ar.isDetailedDesignSubmitted 改为 ar.detailedDesignSubmitted
+            "SUM(CASE WHEN ar.detailedDesignSubmitted = true THEN 1 ELSE 0 END), " +
+            "AVG(CASE WHEN ar.detailedDesignScore IS NOT NULL THEN ar.detailedDesignScore ELSE NULL END)" +
+            ") " +
+            "FROM Requirement r LEFT JOIN r.architecturalRequirement ar " +
+            "WHERE r.groupName IS NOT NULL AND r.groupName != '' " +
+            "GROUP BY r.groupName")
+    List<GroupMetricsDTO> findGroupMetrics();
+    // === END: 修正 ===
 }

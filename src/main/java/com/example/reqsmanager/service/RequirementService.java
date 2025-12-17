@@ -1,9 +1,6 @@
 package com.example.reqsmanager.service;
 
-import com.example.reqsmanager.dto.ArchitecturalRequirementDTO;
-import com.example.reqsmanager.dto.RequirementAnalysisDTO;
-import com.example.reqsmanager.dto.RequirementGeneralDTO;
-import com.example.reqsmanager.dto.RequirementExportDTO;
+import com.example.reqsmanager.dto.*;
 import com.example.reqsmanager.entity.ArchitecturalRequirement;
 import com.example.reqsmanager.entity.Requirement;
 import com.example.reqsmanager.entity.ReviewInfo;
@@ -256,6 +253,11 @@ public class RequirementService {
         dto.setName(req.getName());
         dto.setBusinessLeader(req.getBusinessLeader());
         dto.setTechLeader(req.getTechLeader());
+        // === START: 新增字段的映射 ===
+        dto.setLeadDepartment(req.getLeadDepartment());
+        dto.setGroupName(req.getGroupName());
+        // === END ===
+        dto.setReqType(req.getReqType());
         dto.setBusinessLine(req.getBusinessLine());
         dto.setDevLeader(req.getDevLeader());
         dto.setScheduleDate(req.getScheduleDate());
@@ -283,4 +285,9 @@ public class RequirementService {
         return dto;
     }
 
+    // === START: 新增获取指标的方法 ===
+    public List<GroupMetricsDTO> getGroupMetrics() {
+        return requirementRepository.findGroupMetrics();
+    }
+    // === END ===
 }

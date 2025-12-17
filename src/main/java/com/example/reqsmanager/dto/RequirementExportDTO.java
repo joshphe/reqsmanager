@@ -11,6 +11,11 @@ public class RequirementExportDTO {
     private String name;
     private String businessLeader;
     private String techLeader;
+    // === START: 新增字段 ===
+    private String leadDepartment;
+    private String groupName;
+    // === END ===
+    private String ReqType;
     private String businessLine;
     private String devLeader;
     private LocalDate scheduleDate;

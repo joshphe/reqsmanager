@@ -121,13 +121,15 @@ public class RequirementController {
         List<RequirementExportDTO> exportData = requirementService.findAllForExport();
 
         // 3. 动态生成表头 (通过反射)
-        // 注意：这里的中文表头顺序和内容需要您根据实际业务需求来定义
+        // === START: 1. 在表头数组中添加“需求类型” ===
         String[] headers = {
-                "需求编号", "需求名称", "业务负责人", "科技负责人", "业务条线", "开发负责人", "需求排期",
-                "是否重要需求", "是否递交概要设计", "概要设计递交人", "概要设计递交日期", "概要设计评审通过日期",
-                "是否递交详细设计", "详细设计递交人", "详细设计递交日期", "是否涉及架构决策", "是否涉及基础架构",
+                "需求编号", "需求名称", "业务负责人", "科技负责人", "牵头部室", "所属小组", "需求类型", // 已添加
+                "业务条线", "开发负责人", "需求排期", "是否重要需求", "是否递交概要设计",
+                "概要设计递交人", "概要设计递交日期", "概要设计评审通过日期", "是否递交详细设计",
+                "详细设计递交人", "详细设计递交日期", "是否涉及架构决策", "是否涉及基础架构",
                 "是否涉及高阶汇报", "概要设计评分", "概要设计扣分原因", "详细设计评分", "详细设计扣分原因"
         };
+        // === END ===
 
         try (PrintWriter writer = response.getWriter()) {
             // 写入 BOM 以兼容 Excel
@@ -142,6 +144,9 @@ public class RequirementController {
                         escapeCsv(dto.getName()),
                         escapeCsv(dto.getBusinessLeader()),
                         escapeCsv(dto.getTechLeader()),
+                        escapeCsv(dto.getLeadDepartment()), // 新增
+                        escapeCsv(dto.getGroupName()),      // 新增
+                        escapeCsv(dto.getReqType()), // 已添加
                         escapeCsv(dto.getBusinessLine()),
                         escapeCsv(dto.getDevLeader()),
                         escapeCsv(dto.getScheduleDate()),

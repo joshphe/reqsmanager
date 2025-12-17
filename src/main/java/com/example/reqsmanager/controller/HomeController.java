@@ -1,10 +1,13 @@
 package com.example.reqsmanager.controller;
 
+import com.example.reqsmanager.dto.GroupMetricsDTO;
 import com.example.reqsmanager.service.RequirementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import java.util.List;
 
 @Controller
 public class HomeController {
@@ -19,6 +22,10 @@ public class HomeController {
         long totalRequirements = requirementService.getTotalRequirements();
         model.addAttribute("totalRequirements", totalRequirements);
 
+        // === START: 新增获取分组指标的逻辑 ===
+        List<GroupMetricsDTO> groupMetrics = requirementService.getGroupMetrics();
+        model.addAttribute("groupMetrics", groupMetrics);
+        // === END ===
         // 3. 指定视图并返回布局
         model.addAttribute("view", "home");
         return "layout";
