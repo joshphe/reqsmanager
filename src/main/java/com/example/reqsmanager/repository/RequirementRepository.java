@@ -46,4 +46,14 @@ public interface RequirementRepository extends JpaRepository<Requirement, Intege
             "GROUP BY r.groupName")
     List<GroupMetricsDTO> findGroupMetrics();
     // === END: 修正 ===
+
+    // === START: 新增方法 ===
+    /**
+     * 根据需求编号检查需求是否存在。
+     * Spring Data JPA 会自动根据方法名生成查询。
+     * @param reqId 需求编号
+     * @return 如果存在则返回 true，否则返回 false
+     */
+    boolean existsByReqId(String reqId);
+    // === END ===
 }

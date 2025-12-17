@@ -6,13 +6,23 @@ import com.example.reqsmanager.entity.Requirement;
 import com.example.reqsmanager.entity.ReviewInfo;
 import com.example.reqsmanager.repository.ArchitecturalRequirementRepository;
 import com.example.reqsmanager.repository.RequirementRepository;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -288,6 +298,78 @@ public class RequirementService {
     // === START: 新增获取指标的方法 ===
     public List<GroupMetricsDTO> getGroupMetrics() {
         return requirementRepository.findGroupMetrics();
+    }
+    // === END ===
+
+    // === START: 新增导入功能的核心方法 ===
+    /**
+     * 从上传的 CSV 文件中批量导入需求。
+     * @param file 用户上传的 MultipartFile
+     * @return 一个包含处理结果的摘要字符串
+     */
+    @Transactional
+    public String importFromCsv(MultipartFile file) {
+        List<Requirement> newRequirements = new ArrayList<>();
+        int skippedCount = 0;
+
+        // 定义 CSV 文件中日期的格式，例如 "2023/1/1"
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/M/d");
+
+        try (BufferedReader fileReader = new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
+            // 配置 CSV 解析器，假设文件有表头，我们将忽略它
+            CSVParser csvParser = new CSVParser(fileReader,
+                    CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim());
+
+            for (CSVRecord record : csvParser) {
+                // A列: 需求编号 (索引为0)
+                String reqId = record.get(0);
+
+                // 如果需求编号为空或已存在，则跳过
+                if (reqId == null || reqId.isEmpty() || requirementRepository.existsByReqId(reqId)) {
+                    skippedCount++;
+                    continue;
+                }
+
+                Requirement req = new Requirement();
+                req.setReqId(reqId);
+                // B列: 需求名称
+                req.setName(record.get(1));
+                // D列: 需求科技负责人
+                req.setTechLeader(record.get(3));
+                // E列: 需求类型
+                req.setReqType(record.get(4));
+                // F列: 牵头部室
+                req.setLeadDepartment(record.get(5));
+                // N列: 计划投产日期 (索引为13)
+                try {
+                    String dateStr = record.get(13);
+                    if (dateStr != null && !dateStr.isEmpty()) {
+                        req.setScheduleDate(LocalDate.parse(dateStr, dateFormatter));
+                    }
+                } catch (Exception e) {
+                    // 日期格式错误，可以记录日志，但我们选择跳过这个字段
+                    System.err.println("Skipping invalid date format for reqId: " + reqId);
+                }
+
+                // 级联创建空的关联对象
+                ArchitecturalRequirement archReq = new ArchitecturalRequirement();
+                archReq.setRequirement(req);
+                req.setArchitecturalRequirement(archReq);
+
+                newRequirements.add(req);
+            }
+
+            // 批量保存所有新需求，比逐条保存性能更好
+            if (!newRequirements.isEmpty()) {
+                requirementRepository.saveAll(newRequirements);
+            }
+
+        } catch (Exception e) {
+            // 抛出运行时异常，触发事务回滚
+            throw new RuntimeException("CSV 文件处理失败: " + e.getMessage());
+        }
+
+        return String.format("导入完成！新增记录: %d 条，跳过重复记录: %d 条。", newRequirements.size(), skippedCount);
     }
     // === END ===
 }

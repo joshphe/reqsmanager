@@ -13,6 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -186,4 +188,29 @@ public class RequirementController {
         return stringValue;
     }
     // === END: 彻底重构导出方法 ===
+
+    // === START: 新增文件上传处理方法 ===
+    /**
+     * 处理 CSV 文件的上传和导入请求。
+     */
+    @PostMapping("/import")
+    public String uploadFile(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
+        // 检查文件是否为空
+        if (file.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "请选择一个 CSV 文件上传！");
+            return "redirect:/requirements/";
+        }
+
+        try {
+            // 调用 Service 层处理文件
+            String message = requirementService.importFromCsv(file);
+            redirectAttributes.addFlashAttribute("success", message);
+        } catch (Exception e) {
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", "文件导入失败: " + e.getMessage());
+        }
+
+        return "redirect:/requirements/";
+    }
+    // === END ===
 }
