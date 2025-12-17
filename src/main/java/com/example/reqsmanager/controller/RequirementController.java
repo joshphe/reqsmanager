@@ -213,4 +213,54 @@ public class RequirementController {
         return "redirect:/requirements/";
     }
     // === END ===
+
+    // === START: 新增模板下载方法 ===
+    /**
+     * 提供 CSV 导入模板的下载功能。
+     * @param response HttpServletResponse 对象，用于直接写入文件流
+     */
+    @GetMapping("/template")
+    public void downloadTemplate(HttpServletResponse response) throws IOException {
+        // 1. 设置 HTTP 响应头
+        response.setContentType("text/csv; charset=UTF-8");
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        response.setHeader("Content-Disposition", "attachment; filename=\"import_template.csv\"");
+
+        // 2. 定义表头 (这个顺序必须与导入逻辑的读取顺序完全一致)
+        //    根据之前的导入逻辑，我们只需要 A, B, D, E, F, N 这几列
+        String[] headers = {
+                "需求编号", // A
+                "需求名称", // B
+                "C-占位列", // C
+                "需求科技负责人", // D
+                "需求类型", // E
+                "牵头部室", // F
+                "G-占位列", "H-占位列", "I-占位列", "J-占位列", "K-占位列", "L-占位列", "M-占位列",
+                "计划投产日期" // N
+        };
+
+        // 3. 定义一行样例数据
+        String[] exampleData = {
+                "REQ-2025-DEMO-001", // A
+                "这是一个需求名称的样例", // B
+                "", // C
+                "张三", // D
+                "常规项目", // E
+                "零售银行部", // F
+                "", "", "", "", "", "", "",
+                "2025/12/31" // N (注意日期格式 yyyy/M/d)
+        };
+
+        try (PrintWriter writer = response.getWriter()) {
+            // 写入 BOM 以兼容 Excel
+            writer.write('\ufeff');
+
+            // 写入表头行
+            writer.println(String.join(",", headers));
+
+            // 写入样例数据行
+            writer.println(String.join(",", exampleData));
+        }
+    }
+    // === END ===
 }

@@ -37,6 +37,11 @@
 
         <!-- 新增按钮 -->
         <div>
+            <!-- === START: 新增“下载模板”链接 === -->
+            <a th:href="@{/requirements/template}" class="btn btn-outline-secondary">
+                下载导入模板
+            </a>
+            <!-- === END === -->
             <!-- === START: 新增“批量导入”按钮 === -->
             <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#importModal">
                 批量导入
