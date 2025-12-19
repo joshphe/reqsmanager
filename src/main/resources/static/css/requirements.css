@@ -66,6 +66,7 @@
 .table .col-req-id,
 .table .col-project-number {
     min-width: 200px;
+    max-width: 250px;
 }
 
 /* 需求名称 */
