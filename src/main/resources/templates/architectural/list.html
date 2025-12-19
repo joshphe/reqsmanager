@@ -33,16 +33,11 @@
                 <th>概要设计递交人</th>
                 <th>概要设计递交日期</th>
                 <th>概要设计评审通过日期</th>
-                <th>是否递交详细设计</th>
-                <th>详细设计递交人</th>
-                <th>详细设计递交日期</th>
                 <th>是否涉及架构决策</th>
                 <th>是否涉及基础架构</th>
                 <th>是否涉及高阶汇报</th>
                 <th>概要设计评分</th>
                 <th>概要设计扣分原因</th>
-                <th>详细设计评分</th>
-                <th>详细设计扣分原因</th>
                 <!-- === START: 新增表头 === -->
                 <th>评审检核是否一致</th>
                 <!-- === END === -->
@@ -82,18 +77,6 @@
                 <td th:text="${req.architecturalRequirement?.summaryDesignSubmitDate != null ? #temporals.format(req.architecturalRequirement.summaryDesignSubmitDate, 'yyyy-MM-dd') : ''}"></td>
                 <td th:text="${req.architecturalRequirement?.summaryDesignReviewPassDate != null ? #temporals.format(req.architecturalRequirement.summaryDesignReviewPassDate, 'yyyy-MM-dd') : ''}"></td>
                 <td>
-                    <span th:if="${req.architecturalRequirement?.DetailedDesignSubmitted == false}"
-                          style="color: red; font-weight: bold;">
-                        否
-                    </span>
-                    <!-- 如果一致 (areReviewsConsistent == true 或为 null) -->
-                    <span th:unless="${req.architecturalRequirement?.DetailedDesignSubmitted == false}">
-                        是
-                    </span>
-                </td>
-                <td th:text="${req.architecturalRequirement?.detailedDesignSubmitter}"></td>
-                <td th:text="${req.architecturalRequirement?.detailedDesignSubmitDate != null ? #temporals.format(req.architecturalRequirement.detailedDesignSubmitDate, 'yyyy-MM-dd') : ''}"></td>
-                <td>
                     <span th:if="${req.architecturalRequirement?.involvesArchDecision == false}">
                         否
                     </span>
@@ -125,8 +108,6 @@
                 </td>
                 <td th:text="${req.architecturalRequirement?.summaryDesignScore}"></td>
                 <td th:text="${req.architecturalRequirement?.summaryDesignDeductionReason}"></td>
-                <td th:text="${req.architecturalRequirement?.detailedDesignScore}"></td>
-                <td th:text="${req.architecturalRequirement?.detailedDesignDeductionReason}"></td>
                 <td>
                     <!-- 如果不一致 (areReviewsConsistent == false) -->
                     <span th:if="${req.architecturalRequirement?.areReviewsConsistent == false}"
@@ -148,7 +129,7 @@
         </table>
     </div>
 
-    <!-- 分页控件 -->
+    <!-- === START: 重新添加分页控件 === -->
     <div th:if="${page.totalPages > 0}" class="d-flex justify-content-end mt-3">
         <nav aria-label="Page navigation">
             <ul class="pagination">

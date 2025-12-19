@@ -127,9 +127,8 @@ public class RequirementController {
         String[] headers = {
                 "需求编号", "需求名称", "业务负责人", "科技负责人", "牵头部室", "所属小组", "需求类型", // 已添加
                 "业务条线", "开发负责人", "需求排期", "是否重要需求", "是否递交概要设计",
-                "概要设计递交人", "概要设计递交日期", "概要设计评审通过日期", "是否递交详细设计",
-                "详细设计递交人", "详细设计递交日期", "是否涉及架构决策", "是否涉及基础架构",
-                "是否涉及高阶汇报", "概要设计评分", "概要设计扣分原因", "详细设计评分", "详细设计扣分原因"
+                "概要设计递交人", "概要设计递交日期", "概要设计评审通过日期", "是否涉及架构决策", "是否涉及基础架构",
+                "是否涉及高阶汇报", "概要设计评分", "概要设计扣分原因"
         };
         // === END ===
 
@@ -157,16 +156,16 @@ public class RequirementController {
                         escapeCsv(dto.getSummaryDesignSubmitter()),
                         escapeCsv(dto.getSummaryDesignSubmitDate()),
                         escapeCsv(dto.getSummaryDesignReviewPassDate()),
-                        escapeCsv(dto.getIsDetailedDesignSubmitted()),
-                        escapeCsv(dto.getDetailedDesignSubmitter()),
-                        escapeCsv(dto.getDetailedDesignSubmitDate()),
+//                        escapeCsv(dto.getIsDetailedDesignSubmitted()),
+//                        escapeCsv(dto.getDetailedDesignSubmitter()),
+//                        escapeCsv(dto.getDetailedDesignSubmitDate()),
                         escapeCsv(dto.getInvolvesArchDecision()),
                         escapeCsv(dto.getInvolvesInfra()),
                         escapeCsv(dto.getInvolvesSeniorReport()),
                         escapeCsv(dto.getSummaryDesignScore()),
                         escapeCsv(dto.getSummaryDesignDeductionReason()),
-                        escapeCsv(dto.getDetailedDesignScore()),
-                        escapeCsv(dto.getDetailedDesignDeductionReason())
+//                        escapeCsv(dto.getDetailedDesignScore()),
+//                        escapeCsv(dto.getDetailedDesignDeductionReason())
                 };
                 writer.println(String.join(",", data));
             }

@@ -26,14 +26,14 @@ public class RequirementExportDTO {
     private String summaryDesignSubmitter;
     private LocalDate summaryDesignSubmitDate;
     private LocalDate summaryDesignReviewPassDate;
-    private Boolean isDetailedDesignSubmitted;
-    private String detailedDesignSubmitter;
-    private LocalDate detailedDesignSubmitDate;
+//    private Boolean isDetailedDesignSubmitted;
+//    private String detailedDesignSubmitter;
+//    private LocalDate detailedDesignSubmitDate;
     private Boolean involvesArchDecision;
     private Boolean involvesInfra;
     private Boolean involvesSeniorReport;
     private Integer summaryDesignScore;
     private String summaryDesignDeductionReason;
-    private Integer detailedDesignScore;
-    private String detailedDesignDeductionReason;
+//    private Integer detailedDesignScore;
+//    private String detailedDesignDeductionReason;
 }

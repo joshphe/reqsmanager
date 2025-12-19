@@ -18,8 +18,6 @@ public class ArchitecturalRequirement {
     @JoinColumn(name = "requirement_id", nullable = false)
     private Requirement requirement;
 
-    // --- 新增的业务字段 ---
-
     @Column(columnDefinition = "BIT(1) COMMENT '是否重要需求'")
     private Boolean importantRequirement = false;
 
@@ -35,15 +33,6 @@ public class ArchitecturalRequirement {
     @Column(columnDefinition = "DATE COMMENT '概要设计评审通过日期'")
     private LocalDate summaryDesignReviewPassDate;
 
-    @Column(columnDefinition = "BIT(1) COMMENT '是否递交详细设计'")
-    private Boolean detailedDesignSubmitted = false;
-
-    @Column(length = 50, columnDefinition = "VARCHAR(50) COMMENT '详细设计递交人'")
-    private String detailedDesignSubmitter;
-
-    @Column(columnDefinition = "DATE COMMENT '详细设计递交日期'")
-    private LocalDate detailedDesignSubmitDate;
-
     @Column(columnDefinition = "BIT(1) COMMENT '是否涉及架构决策'")
     private Boolean involvesArchDecision = false;
 
@@ -58,12 +47,6 @@ public class ArchitecturalRequirement {
 
     @Column(columnDefinition = "TEXT COMMENT '概要设计扣分原因'")
     private String summaryDesignDeductionReason;
-
-    @Column(columnDefinition = "INT COMMENT '详细设计评分'")
-    private Integer detailedDesignScore;
-
-    @Column(columnDefinition = "TEXT COMMENT '详细设计扣分原因'")
-    private String detailedDesignDeductionReason;
 
     // === START: 核心修改 ===
     /**

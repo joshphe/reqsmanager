@@ -75,18 +75,18 @@ public class ArchitecturalRequirementController {
         dto.setSummaryDesignSubmitter(archReq.getSummaryDesignSubmitter());
         dto.setSummaryDesignSubmitDate(archReq.getSummaryDesignSubmitDate());
         dto.setSummaryDesignReviewPassDate(archReq.getSummaryDesignReviewPassDate());
-        dto.setDetailedDesignSubmitted(archReq.getDetailedDesignSubmitted());
+//        dto.setDetailedDesignSubmitted(archReq.getDetailedDesignSubmitted());
         dto.setInvolvesArchDecision(archReq.getInvolvesArchDecision());
         dto.setInvolvesInfra(archReq.getInvolvesInfra());
         dto.setInvolvesSeniorReport(archReq.getInvolvesSeniorReport());
-        dto.setDetailedDesignSubmitter(archReq.getDetailedDesignSubmitter());
-        dto.setDetailedDesignSubmitDate(archReq.getDetailedDesignSubmitDate());
+//        dto.setDetailedDesignSubmitter(archReq.getDetailedDesignSubmitter());
+//        dto.setDetailedDesignSubmitDate(archReq.getDetailedDesignSubmitDate());
 
         // === START: 补全这四个字段的映射 ===
         dto.setSummaryDesignScore(archReq.getSummaryDesignScore());
         dto.setSummaryDesignDeductionReason(archReq.getSummaryDesignDeductionReason());
-        dto.setDetailedDesignScore(archReq.getDetailedDesignScore());
-        dto.setDetailedDesignDeductionReason(archReq.getDetailedDesignDeductionReason());
+//        dto.setDetailedDesignScore(archReq.getDetailedDesignScore());
+//        dto.setDetailedDesignDeductionReason(archReq.getDetailedDesignDeductionReason());
         // === END ===
 
         ReviewInfo reviewInfo = archReq.getReviewInfo();

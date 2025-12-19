@@ -217,24 +217,15 @@ public class RequirementService {
         archReq.setSummaryDesignSubmitter(dto.getSummaryDesignSubmitter());
         archReq.setSummaryDesignSubmitDate(dto.getSummaryDesignSubmitDate());
         archReq.setSummaryDesignReviewPassDate(dto.getSummaryDesignReviewPassDate());
-        archReq.setDetailedDesignSubmitted(dto.getDetailedDesignSubmitted());
-        archReq.setDetailedDesignSubmitter(dto.getDetailedDesignSubmitter());
-        archReq.setDetailedDesignSubmitDate(dto.getDetailedDesignSubmitDate());
         archReq.setInvolvesArchDecision(dto.getInvolvesArchDecision());
         archReq.setInvolvesInfra(dto.getInvolvesInfra());
         archReq.setInvolvesSeniorReport(dto.getInvolvesSeniorReport());
         archReq.setSummaryDesignScore(dto.getSummaryDesignScore());
         archReq.setSummaryDesignDeductionReason(dto.getSummaryDesignDeductionReason());
-        archReq.setDetailedDesignScore(dto.getDetailedDesignScore());
-        archReq.setDetailedDesignDeductionReason(dto.getDetailedDesignDeductionReason());
 
         // 3. 保存并返回
         return architecturalRequirementRepository.save(archReq);
     }
-
-    // ===============================================
-    // ============ 用于数据导出的方法 ============
-    // ===============================================
 
     /**
      * 获取所有需求数据，并将其转换为用于导出的“扁平化”DTO列表。
@@ -263,10 +254,8 @@ public class RequirementService {
         dto.setName(req.getName());
         dto.setBusinessLeader(req.getBusinessLeader());
         dto.setTechLeader(req.getTechLeader());
-        // === START: 新增字段的映射 ===
         dto.setLeadDepartment(req.getLeadDepartment());
         dto.setGroupName(req.getGroupName());
-        // === END ===
         dto.setReqType(req.getReqType());
         dto.setBusinessLine(req.getBusinessLine());
         dto.setDevLeader(req.getDevLeader());
@@ -280,16 +269,11 @@ public class RequirementService {
             dto.setSummaryDesignSubmitter(archReq.getSummaryDesignSubmitter());
             dto.setSummaryDesignSubmitDate(archReq.getSummaryDesignSubmitDate());
             dto.setSummaryDesignReviewPassDate(archReq.getSummaryDesignReviewPassDate());
-            dto.setIsDetailedDesignSubmitted(archReq.getDetailedDesignSubmitted());
-            dto.setDetailedDesignSubmitter(archReq.getDetailedDesignSubmitter());
-            dto.setDetailedDesignSubmitDate(archReq.getDetailedDesignSubmitDate());
             dto.setInvolvesArchDecision(archReq.getInvolvesArchDecision());
             dto.setInvolvesInfra(archReq.getInvolvesInfra());
             dto.setInvolvesSeniorReport(archReq.getInvolvesSeniorReport());
             dto.setSummaryDesignScore(archReq.getSummaryDesignScore());
             dto.setSummaryDesignDeductionReason(archReq.getSummaryDesignDeductionReason());
-            dto.setDetailedDesignScore(archReq.getDetailedDesignScore());
-            dto.setDetailedDesignDeductionReason(archReq.getDetailedDesignDeductionReason());
         }
 
         return dto;

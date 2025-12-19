@@ -74,32 +74,6 @@
                 <textarea th:field="*{summaryDesignDeductionReason}" class="form-control" rows="1"></textarea>
             </div>
         </div>
-        <!-- === END: 修正 === -->
-        <div class="form-check mb-3">
-            <input type="checkbox" th:field="*{detailedDesignSubmitted}" class="form-check-input">
-            <label class="form-check-label">是否递交详细设计</label>
-        </div>
-        <div class="form-row">
-            <div class="form-group col-md-6"><label>详细设计递交人</label><input type="text" th:field="*{detailedDesignSubmitter}" class="form-control"></div>
-            <!-- === START: 修正此处的日期输入框 === -->
-            <div class="form-group col-md-6">
-                <label>详细设计递交日期</label>
-                <input type="date" name="detailedDesignSubmitDate" class="form-control"
-                       th:value="${dto.detailedDesignSubmitDate != null ? #temporals.format(dto.detailedDesignSubmitDate, 'yyyy-MM-dd') : ''}">
-            </div>
-        </div>
-        <!-- === START: 补全详细设计评分和扣分原因 === -->
-        <div class="form-row">
-            <div class="form-group col-md-2">
-                <label>详细设计评分</label>
-                <input type="number" th:field="*{detailedDesignScore}" class="form-control">
-            </div>
-            <div class="form-group col-md-10">
-                <label>详细设计扣分原因</label>
-                <textarea th:field="*{detailedDesignDeductionReason}" class="form-control" rows="1"></textarea>
-            </div>
-        </div>
-
         <!-- === START: 补全缺失的 Checkbox 字段 === -->
         <div class="form-row mb-3">
             <div class="col-auto"><div class="form-check">

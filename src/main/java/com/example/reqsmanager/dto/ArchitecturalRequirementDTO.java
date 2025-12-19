@@ -16,11 +16,11 @@ public class ArchitecturalRequirementDTO {
     private String summaryDesignSubmitter;
     private LocalDate summaryDesignSubmitDate;
     private LocalDate summaryDesignReviewPassDate;
-    private Boolean detailedDesignSubmitted;
+//    private Boolean detailedDesignSubmitted;
     // === END: 修正 ===
 
-    private String detailedDesignSubmitter;
-    private LocalDate detailedDesignSubmitDate;
+    /*private String detailedDesignSubmitter;
+    private LocalDate detailedDesignSubmitDate;*/
 
     // === START: 修正所有布尔字段的命名，去掉 'is' 前缀 ===
     private Boolean involvesArchDecision;
@@ -30,8 +30,8 @@ public class ArchitecturalRequirementDTO {
 
     private Integer summaryDesignScore;
     private String summaryDesignDeductionReason;
-    private Integer detailedDesignScore;
-    private String detailedDesignDeductionReason;
+//    private Integer detailedDesignScore;
+//    private String detailedDesignDeductionReason;
 
 
     // ReviewInfo 的 ID，非常重要

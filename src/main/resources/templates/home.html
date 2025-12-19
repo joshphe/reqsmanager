@@ -29,22 +29,18 @@
                             <th>需求总数</th>
                             <th>概要设计已递交数</th>
                             <th>概要设计平均分</th>
-                            <th>详细设计已递交数</th>
-                            <th>详细设计平均分</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr th:if="${#lists.isEmpty(groupMetrics)}">
-                            <td colspan="6" class="text-center">暂无分组统计数据</td>
+                            <!-- colspan 从 6 改为 4 -->
+                            <td colspan="4" class="text-center">暂无分组统计数据</td>
                         </tr>
                         <tr th:each="metric : ${groupMetrics}">
                             <td th:text="${metric.groupName}"></td>
                             <td th:text="${metric.totalRequirements}"></td>
                             <td th:text="${metric.summaryDesignsSubmitted}"></td>
-                            <!-- 使用 #numbers.formatDecimal 格式化平均分，保留两位小数 -->
                             <td th:text="${metric.averageSummaryScore != null ? #numbers.formatDecimal(metric.averageSummaryScore, 1, 2) : 'N/A'}"></td>
-                            <td th:text="${metric.detailedDesignsSubmitted}"></td>
-                            <td th:text="${metric.averageDetailedScore != null ? #numbers.formatDecimal(metric.averageDetailedScore, 1, 2) : 'N/A'}"></td>
                         </tr>
                         </tbody>
                     </table>

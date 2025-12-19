@@ -41,18 +41,18 @@ public class ArchitecturalRequirementService {
         archReq.setSummaryDesignSubmitter(dto.getSummaryDesignSubmitter());
         archReq.setSummaryDesignSubmitDate(dto.getSummaryDesignSubmitDate());
         archReq.setSummaryDesignReviewPassDate(dto.getSummaryDesignReviewPassDate());
-        archReq.setDetailedDesignSubmitted(dto.getDetailedDesignSubmitted());
+//        archReq.setDetailedDesignSubmitted(dto.getDetailedDesignSubmitted());
         archReq.setInvolvesArchDecision(dto.getInvolvesArchDecision());
         archReq.setInvolvesInfra(dto.getInvolvesInfra());
         archReq.setInvolvesSeniorReport(dto.getInvolvesSeniorReport());
-        archReq.setDetailedDesignSubmitter(dto.getDetailedDesignSubmitter());
-        archReq.setDetailedDesignSubmitDate(dto.getDetailedDesignSubmitDate());
+//        archReq.setDetailedDesignSubmitter(dto.getDetailedDesignSubmitter());
+//        archReq.setDetailedDesignSubmitDate(dto.getDetailedDesignSubmitDate());
 
         // === START: 补全这四个字段的保存逻辑 ===
         archReq.setSummaryDesignScore(dto.getSummaryDesignScore());
         archReq.setSummaryDesignDeductionReason(dto.getSummaryDesignDeductionReason());
-        archReq.setDetailedDesignScore(dto.getDetailedDesignScore());
-        archReq.setDetailedDesignDeductionReason(dto.getDetailedDesignDeductionReason());
+//        archReq.setDetailedDesignScore(dto.getDetailedDesignScore());
+//        archReq.setDetailedDesignDeductionReason(dto.getDetailedDesignDeductionReason());
         // === END ===
 
         // 2. 更新关联的 ReviewInfo
