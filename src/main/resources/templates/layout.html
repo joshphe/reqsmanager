@@ -62,6 +62,23 @@
         <li class="nav-item"><a class="nav-link" th:href="@{/arch-projects/}"
                                 th:classappend="${view != null and view.startsWith('arch-projects') ? 'active' : ''}">架构项目管理</a>
         </li>
+        <!-- === START: 新增系统配置折叠菜单 === -->
+        <li class="nav-item">
+            <a class="nav-link dropdown-toggle" href="#systemConfigMenu" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="systemConfigMenu">
+                系统配置
+            </a>
+            <div class="collapse" id="systemConfigMenu">
+                <ul class="nav flex-column ml-3">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/teams/}">团队管理</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/members/}">成员管理</a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+        <!-- === END === -->
     </ul>
     <div class="p-3 mt-auto">
         <form th:action="@{/logout}" method="post">

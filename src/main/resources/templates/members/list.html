@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="content">
+  <h1>成员管理</h1>
+  <hr>
+  <div class="mb-3">
+    <a th:href="@{/members/create}" class="btn btn-success">新增成员</a>
+  </div>
+  <table class="table table-striped table-hover">
+    <thead class="thead-dark">
+    <tr>
+      <th>姓名</th>
+      <th>所属团队</th>
+      <th>所属小组</th>
+      <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="member : ${members}">
+      <td th:text="${member.name}"></td>
+      <td th:text="${member.team.name}"></td>
+      <td th:text="${member.teamGroup.name}"></td>
+      <td>
+        <a th:href="@{/members/edit/{id}(id=${member.id})}" class="btn btn-warning btn-sm">编辑</a>
+        <a th:href="@{/members/delete/{id}(id=${member.id})}" class="btn btn-danger btn-sm ml-2" onclick="return confirm('确定删除该成员吗？')">删除</a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+</body>
+</html>

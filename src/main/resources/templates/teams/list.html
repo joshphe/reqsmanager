@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="content">
+  <h1>团队与小组管理</h1>
+  <hr>
+  <div class="row">
+    <!-- 左侧：新增团队 -->
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header">新增团队</div>
+        <div class="card-body">
+          <form th:action="@{/teams/add}" method="post">
+            <div class="form-group">
+              <label>团队名称</label>
+              <input type="text" name="teamName" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary">添加团队</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右侧：团队与小组列表 -->
+    <div class="col-md-8">
+      <div th:if="${#lists.isEmpty(teams)}" class="alert alert-info">暂无团队信息，请先添加。</div>
+
+      <div id="accordion" th:unless="${#lists.isEmpty(teams)}">
+        <div class="card mb-2" th:each="team, iter : ${teams}">
+          <div class="card-header d-flex justify-content-between align-items-center" th:id="'heading' + ${iter.index}">
+            <h5 class="mb-0">
+              <button class="btn btn-link" data-toggle="collapse" th:data-target="'#collapse' + ${iter.index}" aria-expanded="true">
+                <span th:text="${team.name}"></span>
+              </button>
+            </h5>
+            <a th:href="@{/teams/delete/{id}(id=${team.id})}" class="btn btn-danger btn-sm" onclick="return confirm('确定删除整个团队及其所有小组吗？')">删除团队</a>
+          </div>
+
+          <div th:id="'collapse' + ${iter.index}" class="collapse show" th:classappend="${iter.index == 0 ? 'show' : ''}">
+            <div class="card-body">
+              <h6>小组列表</h6>
+              <ul class="list-group list-group-flush mb-3">
+                <li th:if="${#lists.isEmpty(team.groups)}" class="list-group-item">暂无小组</li>
+                <li th:each="group : ${team.groups}" class="list-group-item d-flex justify-content-between align-items-center">
+                  <span th:text="${group.name}"></span>
+                  <a th:href="@{/teams/groups/delete/{groupId}(groupId=${group.id})}" class="btn btn-outline-danger btn-sm" onclick="return confirm('确定删除该小组吗？')">×</a>
+                </li>
+              </ul>
+              <h6>新增小组</h6>
+              <form th:action="@{/teams/groups/add}" method="post" class="form-inline">
+                <input type="hidden" name="teamId" th:value="${team.id}">
+                <input type="text" name="groupName" class="form-control mr-2" placeholder="输入小组名称" required>
+                <button type="submit" class="btn btn-secondary btn-sm">添加小组</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

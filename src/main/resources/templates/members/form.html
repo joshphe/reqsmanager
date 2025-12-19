@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title th:text="${pageTitle}"></title>
+  <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+<body>
+<div class="container mt-5">
+  <h1 th:text="${pageTitle}"></h1>
+  <hr>
+  <form th:action="@{/members/save}" th:object="${member}" method="post">
+    <input type="hidden" th:field="*{id}">
+    <div class="form-group">
+      <label>成员姓名</label>
+      <input type="text" th:field="*{name}" class="form-control" required>
+    </div>
+    <div class="form-group">
+      <label>所属团队</label>
+      <select id="teamSelect" name="teamId" class="form-control" required>
+        <option value="">-- 请选择团队 --</option>
+        <option th:each="team : ${teams}"
+                th:value="${team.id}"
+                th:text="${team.name}"
+                th:selected="${member.team != null and member.team.id == team.id}"></option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>所属小组</label>
+      <select id="groupSelect" name="groupId" class="form-control" required>
+        <option value="">-- 请先选择团队 --</option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary">保存</button>
+    <a th:href="@{/members/}" class="btn btn-secondary">取消</a>
+  </form>
+
+  <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+
+  <!-- === START: 核心修正此处的 JavaScript === -->
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+
+    // 1. 安全地获取数据
+    const teamsData = /*[[${teams}]]*/ [];
+    // 关键：在访问 .teamGroup 之前，先检查 member 和 member.team 是否为 null
+    const selectedGroupId = /*[[${member != null && member.teamGroup != null ? member.teamGroup.id : null}]]*/ null;
+
+    $(document).ready(function() {
+      const $teamSelect = $('#teamSelect');
+      const $groupSelect = $('#groupSelect');
+
+      function updateGroups() {
+        const teamId = $teamSelect.val();
+        $groupSelect.empty(); // 清空小组下拉框
+
+        if (!teamId) {
+          $groupSelect.append('<option value="">-- 请先选择团队 --</option>');
+          return;
+        }
+
+        const selectedTeam = teamsData.find(team => team.id == teamId);
+
+        $groupSelect.append('<option value="">-- 请选择小组 --</option>');
+        if (selectedTeam && selectedTeam.groups) {
+          selectedTeam.groups.forEach(group => {
+            $groupSelect.append($('<option>', {
+              value: group.id,
+              text: group.name
+            }));
+          });
+        }
+      }
+
+      // 2. 团队下拉框的 change 事件
+      $teamSelect.on('change', function() {
+        updateGroups();
+      });
+
+      // 3. 如果是编辑模式（有已选中的团队），则初始化小组下拉框
+      if ($teamSelect.val()) {
+        updateGroups(); // 加载对应的小组
+
+        // 延迟设置，以确保 <option> 已经被 JS 添加到 DOM 中
+        setTimeout(function() {
+          if (selectedGroupId) {
+            $groupSelect.val(selectedGroupId);
+          }
+        }, 100);
+      }
+    });
+    /*]]>*/
+  </script>
+  <!-- === END: 核心修正 === -->
+</div>
+</body>
+</html>

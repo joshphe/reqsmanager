@@ -54,19 +54,20 @@
             </div>
             <div class="form-group col-md-6">
                 <label>需求科技负责人</label>
-                <input type="text" th:field="*{techLeader}" class="form-control" placeholder="输入技术方联系人">
+                <input type="text" th:field="*{techLeader}" id="techLeaderInput" class="form-control"
+                       placeholder="输入技术方联系人">
             </div>
         </div>
         <!-- === START: 新增输入框 === -->
         <div class="form-row">
             <div class="form-group col-md-6">
                 <label>牵头部室</label>
-                <input type="text" th:field="*{leadDepartment}" class="form-control">
+                <input type="text" th:field="*{leadDepartment}" id="leadDepartmentInput" class="form-control">
             </div>
             <!-- === START: 新增输入框 === -->
             <div class="form-group col-md-4">
                 <label>所属小组</label>
-                <input type="text" th:field="*{groupName}" class="form-control">
+                <input type="text" th:field="*{groupName}" id="groupNameInput" class="form-control">
             </div>
             <!-- === END: 新增输入框 === -->
             <div class="form-group col-md-6">
@@ -103,5 +104,40 @@
         <a th:href="@{/requirements/}" class="btn btn-secondary">取消</a>
     </form>
 </div>
+
+<!-- === START: 添加 AJAX 自动填充的 JavaScript === -->
+<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+<script>
+    $(document).ready(function () {
+        // 监听“科技负责人”输入框的“失去焦点”事件
+        $('#techLeaderInput').on('blur', function () {
+            var techLeaderName = $(this).val().trim();
+
+            // 如果输入为空，则清空下面两个框
+            if (techLeaderName === '') {
+                $('#leadDepartmentInput').val('');
+                $('#groupNameInput').val('');
+                return;
+            }
+
+            // 发起 AJAX GET 请求
+            $.get('/api/members/find-by-name', {name: techLeaderName})
+                .done(function (data) {
+                    // 请求成功，填充数据
+                    if (data && data.teamName && data.groupName) {
+                        $('#leadDepartmentInput').val(data.teamName);
+                        $('#groupNameInput').val(data.groupName);
+                    }
+                })
+                .fail(function () {
+                    // 请求失败 (例如 404 Not Found)，清空数据
+                    console.warn("未找到姓名为 '" + techLeaderName + "' 的成员信息。");
+                    $('#leadDepartmentInput').val('');
+                    $('#groupNameInput').val('');
+                });
+        });
+    });
+</script>
+<!-- === END === -->
 </body>
 </html>
