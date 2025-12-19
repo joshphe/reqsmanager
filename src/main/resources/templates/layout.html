@@ -1,59 +1,165 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>需求管理系统</title>
+    <meta charset="UTF-8">
+    <title>需求管理系统</title>
 
-  <!-- 1. CSS 链接 -->
-  <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
-  <link rel="stylesheet"
-        th:if="${view != null and (view.startsWith('requirements') or view.startsWith('analysis') or view.startsWith('architectural') or view.startsWith('arch-projects'))}"
-        th:href="@{/css/requirements.css}">
+    <!-- 1. CSS 链接 -->
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet"
+          th:if="${view != null and (view.startsWith('requirements') or view.startsWith('analysis') or view.startsWith('architectural') or view.startsWith('arch-projects'))}"
+          th:href="@{/css/requirements.css}">
 
-  <!-- 2. 基础布局内联样式 -->
-  <style>
-    body { display: flex; }
-    .sidebar {
-      width: 220px; height: 100vh; position: fixed; top: 0; left: 0;
-      background-color: #343a40; padding-top: 20px; z-index: 1031;
-    }
-    .sidebar .nav-link { color: #c2c7d0; }
-    .sidebar .nav-link.active, .sidebar .nav-link:hover { color: #fff; background-color: #494e53; }
-    .main-content {
-      margin-left: 220px; padding: 20px; width: calc(100% - 220px);
-    }
-  </style>
+    <!-- 2. 基础布局内联样式 -->
+    <style>
+        body {
+            display: flex;
+        }
+
+        .sidebar {
+            width: 220px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #343a40;
+            padding-top: 20px;
+            z-index: 1031;
+        }
+
+        .sidebar .nav-link {
+            color: #c2c7d0;
+        }
+
+        .sidebar .nav-link.active, .sidebar .nav-link:hover {
+            color: #fff;
+            background-color: #494e53;
+        }
+
+        .main-content {
+            margin-left: 220px;
+            padding: 20px;
+            width: calc(100% - 220px);
+        }
+    </style>
 </head>
 <body>
-
 <!-- 侧边栏 -->
 <nav class="sidebar">
-  <ul class="nav flex-column">
-    <li class="nav-item"><a class="nav-link" th:href="@{/}" th:classappend="${view != null and view.startsWith('home') ? 'active' : ''}">主页</a></li>
-    <li class="nav-item"><a class="nav-link" th:href="@{/requirements/}" th:classappend="${view != null and view.startsWith('requirements') ? 'active' : ''}">需求管理</a></li>
-    <li class="nav-item"><a class="nav-link" th:href="@{/analysis/}" th:classappend="${view != null and view.startsWith('analysis') ? 'active' : ''}">需求分析管理</a></li>
-    <li class="nav-item"><a class="nav-link" th:href="@{/architectural/}" th:classappend="${view != null and view.startsWith('architectural') ? 'active' : ''}">架构需求管理</a></li>
-    <li class="nav-item"><a class="nav-link" th:href="@{/arch-projects/}" th:classappend="${view != null and view.startsWith('arch-projects') ? 'active' : ''}">架构项目管理</a></li>
-  </ul>
-  <div class="p-3 mt-auto">
-    <form th:action="@{/logout}" method="post">
-      <button type="submit" class="btn btn-outline-light btn-block">登出</button>
-    </form>
-  </div>
+    <ul class="nav flex-column">
+        <li class="nav-item"><a class="nav-link" th:href="@{/}"
+                                th:classappend="${view != null and view.startsWith('home') ? 'active' : ''}">主页</a>
+        </li>
+        <li class="nav-item"><a class="nav-link" th:href="@{/requirements/}"
+                                th:classappend="${view != null and view.startsWith('requirements') ? 'active' : ''}">需求管理</a>
+        </li>
+        <li class="nav-item"><a class="nav-link" th:href="@{/analysis/}"
+                                th:classappend="${view != null and view.startsWith('analysis') ? 'active' : ''}">需求分析管理</a>
+        </li>
+        <li class="nav-item"><a class="nav-link" th:href="@{/architectural/}"
+                                th:classappend="${view != null and view.startsWith('architectural') ? 'active' : ''}">架构需求管理</a>
+        </li>
+        <li class="nav-item"><a class="nav-link" th:href="@{/arch-projects/}"
+                                th:classappend="${view != null and view.startsWith('arch-projects') ? 'active' : ''}">架构项目管理</a>
+        </li>
+    </ul>
+    <div class="p-3 mt-auto">
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="btn btn-outline-light btn-block">登出</button>
+        </form>
+    </div>
 </nav>
-
 <!-- 主内容区 -->
 <main class="main-content">
-  <div th:replace="~{${view} :: content}"></div>
+    <div th:replace="~{${view} :: content}"></div>
 </main>
 
 <!--
   3. 核心 JavaScript 库
   !!! 再次确认：必须是 th:src !!!
 -->
-<script th:src="@{/js/jquery-3.7.1.slim.min.js}"></script>
+<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
 <script th:src="@{/js/popper.min.js}"></script>
 <script th:src="@{/js/bootstrap.min.js}"></script>
+<!-- === START: 新增的、用于特定页面的 JavaScript 块 === -->
+<script th:inline="javascript">
+    /*<![CDATA[*/
 
+    // 确保 jQuery 已加载
+    if (typeof jQuery !== 'undefined') {
+        (function ($) {
+            $(document).ready(function () {
+
+                // ===============================================
+                // == 仅在“需求管理”页面执行的 JS (Batch Delete) ==
+                // ===============================================
+                var view = /*[[${view}]]*/ 'default';
+                if (view.startsWith('requirements')) {
+
+                    // --- 全选/全不选功能 ---
+                    $('#selectAllCheckbox').on('click', function () {
+                        $('.req-checkbox').prop('checked', this.checked);
+                    });
+
+                    $(document).on('click', '.req-checkbox', function () {
+                        if (!this.checked) {
+                            $('#selectAllCheckbox').prop('checked', false);
+                        } else if ($('.req-checkbox:checked').length === $('.req-checkbox').length) {
+                            $('#selectAllCheckbox').prop('checked', true);
+                        }
+                    });
+
+                    // --- 批量删除功能 ---
+                    $('#batchDeleteBtn').on('click', function () {
+                        var selectedIds = [];
+                        $('.req-checkbox:checked').each(function () {
+                            selectedIds.push(parseInt($(this).val()));
+                        });
+
+                        if (selectedIds.length === 0) {
+                            alert('请至少选择一个要删除的需求！');
+                            return;
+                        }
+
+                        if (confirm('确定要删除选中的 ' + selectedIds.length + ' 条需求吗？此操作不可恢复！')) {
+                            $.ajax({
+                                url: '/requirements/delete-batch',
+                                type: 'POST',
+                                contentType: 'application/json',
+                                data: JSON.stringify(selectedIds),
+                                success: function (response) {
+                                    alert(response.message || '批量删除成功！');
+                                    location.reload();
+                                },
+                                error: function (xhr) {
+                                    var errorMsg = "删除失败！";
+                                    try {
+                                        var res = JSON.parse(xhr.responseText);
+                                        if (res && res.message) {
+                                            errorMsg += " 原因: " + res.message;
+                                        }
+                                    } catch (e) {
+                                    }
+                                    alert(errorMsg);
+                                }
+                            });
+                        }
+                    });
+                }
+
+                // ===============================================
+                // == 仅在“架构需求管理”页面执行的 JS (Modal) ==
+                // ===============================================
+                if (view.startsWith('architectural')) {
+                    // (这里可以放入之前为详情弹窗编写的 JS 逻辑)
+                }
+
+            });
+        })(jQuery);
+    }
+
+    /*]]>*/
+</script>
+<!-- === END === -->
 </body>
 </html>

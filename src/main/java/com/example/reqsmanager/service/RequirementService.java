@@ -356,4 +356,17 @@ public class RequirementService {
         return String.format("导入完成！新增记录: %d 条，跳过重复记录: %d 条。", newRequirements.size(), skippedCount);
     }
     // === END ===
+
+    // === START: 新增批量删除方法 ===
+    /**
+     * 根据提供的 ID 列表，批量删除需求。
+     * 这是一个事务性操作。
+     * @param ids 要删除的需求 ID 列表
+     */
+    @Transactional
+    public void deleteByIds(List<Integer> ids) {
+        // JpaRepository 提供了高效的批量删除方法
+        requirementRepository.deleteAllById(ids);
+    }
+    // === END ===
 }

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -259,6 +260,27 @@ public class RequirementController {
 
             // 写入样例数据行
             writer.println(String.join(",", exampleData));
+        }
+    }
+    // === END ===
+
+    // === START: 新增批量删除的处理方法 ===
+    /**
+     * 处理批量删除需求的请求。
+     * @param ids 从前端 AJAX 请求体中获取的需求 ID 列表
+     * @return 返回一个表示操作结果的 JSON 响应
+     */
+    @PostMapping("/delete-batch")
+    @ResponseBody // 直接返回响应体，而不是视图
+    public ResponseEntity<String> deleteBatch(@RequestBody List<Integer> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return ResponseEntity.badRequest().body("{\"status\": \"error\", \"message\": \"未选择任何需求！\"}");
+        }
+        try {
+            requirementService.deleteByIds(ids);
+            return ResponseEntity.ok("{\"status\": \"success\", \"message\": \"批量删除成功！\"}");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("{\"status\": \"error\", \"message\": \"删除失败: " + e.getMessage() + "\"}");
         }
     }
     // === END ===

@@ -35,8 +35,13 @@
             <a th:href="@{/requirements/}" class="btn btn-secondary ml-2">清空筛选</a>
         </form>
 
+
+
         <!-- 新增按钮 -->
         <div>
+            <button type="button" class="btn btn-danger" id="batchDeleteBtn">
+                批量删除
+            </button>
             <!-- === START: 新增“下载模板”链接 === -->
             <a th:href="@{/requirements/template}" class="btn btn-outline-secondary">
                 下载导入模板
@@ -58,6 +63,11 @@
         <table class="table table-bordered table-striped">
             <thead class="thead-dark">
             <tr>
+                <!-- === START: 新增“全选”复选框 === -->
+                <th style="width: 50px;" class="text-center">
+                    <input type="checkbox" id="selectAllCheckbox">
+                </th>
+                <!-- === END === -->
                 <th class="frozen col-1 col-req-id">需求编号</th>
                 <th class="frozen col-2 col-req-name">需求名称</th>
                 <th>需求业务负责人</th>
@@ -82,6 +92,11 @@
             </tr>
             <!-- 遍历并显示数据 -->
             <tr th:each="req : ${page.content}">
+                <!-- === START: 新增“单选”复选框 === -->
+                <td class="text-center">
+                    <input type="checkbox" class="req-checkbox" th:value="${req.id}">
+                </td>
+                <!-- === END === -->
                 <td class="frozen col-1 col-req-id" th:text="${req.reqId}"></td>
                 <td class="frozen col-2 col-req-name" th:text="${req.name}"></td>
                 <td th:text="${req.businessLeader}"></td>
