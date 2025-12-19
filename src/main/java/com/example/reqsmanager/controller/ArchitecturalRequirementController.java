@@ -10,6 +10,7 @@ import com.example.reqsmanager.service.RequirementService;
 import com.example.reqsmanager.service.ReviewInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -29,14 +30,31 @@ public class ArchitecturalRequirementController {
     @Autowired
     private ArchitecturalRequirementService architecturalRequirementService;
 
+    // === START: 核心修正此方法 ===
+    /**
+     * 显示列表页，并处理分页和筛选。
+     */
     @GetMapping("/")
-    public String list(Model model, @RequestParam(required = false) String reqId, Pageable pageable) {
-        Page<Requirement> page = requirementService.findRequirements(reqId, pageable);
-        model.addAttribute("page", page);
+    public String list(Model model,
+                       @RequestParam(required = false) String reqId,
+                       @RequestParam(defaultValue = "0") int page,
+                       @RequestParam(defaultValue = "10") int size) {
+
+        // 1. 根据传入的 page 和 size 参数，手动创建 Pageable 对象
+        Pageable pageable = PageRequest.of(page, size);
+
+        // 2. 将 pageable 对象传递给 Service 层
+        Page<Requirement> requirementPage = requirementService.findRequirements(reqId, pageable);
+
+        // 3. 将返回的 Page 对象和 size 一并传给前端
+        model.addAttribute("page", requirementPage);
         model.addAttribute("reqId", reqId);
+        model.addAttribute("size", size); // 确保 size 被传递，以便翻页链接能保持每页条数
+
         model.addAttribute("view", "architectural/list");
         return "layout";
     }
+    // === END: 核心修正 ===
 
     // === START: 只保留这一个处理 /edit/{id} 的方法 ===
     /**
@@ -58,11 +76,9 @@ public class ArchitecturalRequirementController {
         if (archReq.getReviewInfo() == null) {
             ReviewInfo newReviewInfo = new ReviewInfo();
             archReq.setReviewInfo(newReviewInfo);
-            // 保存以确保 ReviewInfo 记录被创建并关联
             architecturalRequirementService.save(archReq);
         }
 
-        // --- 将所有数据映射到一个 DTO ---
         ArchitecturalRequirementDTO dto = new ArchitecturalRequirementDTO();
 
         dto.setRequirementId(req.getId());
@@ -75,19 +91,11 @@ public class ArchitecturalRequirementController {
         dto.setSummaryDesignSubmitter(archReq.getSummaryDesignSubmitter());
         dto.setSummaryDesignSubmitDate(archReq.getSummaryDesignSubmitDate());
         dto.setSummaryDesignReviewPassDate(archReq.getSummaryDesignReviewPassDate());
-//        dto.setDetailedDesignSubmitted(archReq.getDetailedDesignSubmitted());
         dto.setInvolvesArchDecision(archReq.getInvolvesArchDecision());
         dto.setInvolvesInfra(archReq.getInvolvesInfra());
         dto.setInvolvesSeniorReport(archReq.getInvolvesSeniorReport());
-//        dto.setDetailedDesignSubmitter(archReq.getDetailedDesignSubmitter());
-//        dto.setDetailedDesignSubmitDate(archReq.getDetailedDesignSubmitDate());
-
-        // === START: 补全这四个字段的映射 ===
         dto.setSummaryDesignScore(archReq.getSummaryDesignScore());
         dto.setSummaryDesignDeductionReason(archReq.getSummaryDesignDeductionReason());
-//        dto.setDetailedDesignScore(archReq.getDetailedDesignScore());
-//        dto.setDetailedDesignDeductionReason(archReq.getDetailedDesignDeductionReason());
-        // === END ===
 
         ReviewInfo reviewInfo = archReq.getReviewInfo();
         dto.setReviewInfoId(reviewInfo.getId());
@@ -117,7 +125,6 @@ public class ArchitecturalRequirementController {
 
         return "architectural/form";
     }
-    // === END: 只保留这一个 ===
 
     @PostMapping("/save")
     public String save(@ModelAttribute("dto") ArchitecturalRequirementDTO dto) {

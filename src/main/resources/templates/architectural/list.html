@@ -38,16 +38,13 @@
                 <th>是否涉及高阶汇报</th>
                 <th>概要设计评分</th>
                 <th>概要设计扣分原因</th>
-                <!-- === START: 新增表头 === -->
                 <th>评审检核是否一致</th>
-                <!-- === END === -->
-                <!-- 固定列 (右) -->
                 <th class="frozen col-last col-actions">操作</th>
             </tr>
             </thead>
             <tbody>
             <tr th:if="${page.empty}">
-                <td colspan="18" class="text-center">没有找到相关需求</td>
+                <td colspan="14" class="text-center">没有找到相关需求</td>
             </tr>
             <tr th:each="req : ${page.content}">
                 <!-- 固定列 (左) -->
@@ -55,21 +52,21 @@
                 <td class="frozen col-2 col-req-name" th:text="${req.name}"></td>
                 <!-- 滚动列 -->
                 <td>
-                    <span th:if="${req.architecturalRequirement?.ImportantRequirement == false}">
+                    <span th:if="${req.architecturalRequirement?.importantRequirement == false}">
                         否
                     </span>
-                    <span th:unless="${req.architecturalRequirement?.ImportantRequirement == false}"
+                    <span th:unless="${req.architecturalRequirement?.importantRequirement == false}"
                           style="color: red; font-weight: bold;">
                         是
                     </span>
                 </td>
                 <td>
-                    <span th:if="${req.architecturalRequirement?.SummaryDesignSubmitted == false}"
+                    <span th:if="${req.architecturalRequirement?.summaryDesignSubmitted == false}"
                           style="color: red; font-weight: bold;">
                         否
                     </span>
                     <!-- 如果一致 (areReviewsConsistent == true 或为 null) -->
-                    <span th:unless="${req.architecturalRequirement?.SummaryDesignSubmitted == false}">
+                    <span th:unless="${req.architecturalRequirement?.summaryDesignSubmitted == false}">
                         是
                     </span>
                 </td>
@@ -122,7 +119,7 @@
                 <!-- === END === -->
                 <!-- 固定列 (右) -->
                 <td class="frozen col-last col-actions">
-                    <a th:href="@{/architectural/edit/{id}(id=${req.id})}" class="btn btn-warning btn-sm ml-1">详情 / 编辑</a>
+                    <a th:href="@{/architectural/edit/{id}(id=${req.id})}" class="btn btn-primary btn-sm">详情 / 编辑</a>
                 </td>
             </tr>
             </tbody>
