@@ -16,11 +16,19 @@
       <div class="form-group col-md-3"><label>决策编号</label><input type="text" th:field="*{decisionNumber}" class="form-control" required></div>
       <div class="form-group col-md-3"><label>提出方</label><input type="text" th:field="*{proposer}" id="proposerInput" class="form-control"></div>
       <div class="form-group col-md-3"><label>所属团队</label><input type="text" th:field="*{teamName}" id="teamNameInput" class="form-control" readonly></div>
-      <div class="form-group col-md-3"><label>提出日期</label><input type="date" th:field="*{proposalDate}" class="form-control"></div>
+      <div class="form-group col-md-3">
+        <label>提出日期</label>
+        <input type="date" name='proposalDate' class="form-control"
+               th:value="${decision.proposalDate != null ? #temporals.format(decision.proposalDate, 'yyyy-MM-dd') : ''}">
+      </div>
     </div>
     <div class="form-row">
       <div class="form-group col-md-6"><label>决策人员</label><input type="text" th:field="*{decisionMaker}" class="form-control"></div>
-      <div class="form-group col-md-6"><label>决策日期</label><input type="date" th:field="*{decisionDate}" class="form-control"></div>
+      <div class="form-group col-md-6">
+        <label>决策日期</label>
+        <input type="date" name="decisionDate" class="form-control"
+               th:value="${decision.decisionDate != null ? #temporals.format(decision.decisionDate, 'yyyy-MM-dd') : ''}">
+      </div>
     </div>
     <div class="form-row">
       <div class="form-group col-md-6"><label>关联需求编号</label><input type="text" th:field="*{reqId}" class="form-control"></div>

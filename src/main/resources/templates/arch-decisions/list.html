@@ -24,9 +24,9 @@
       <td th:text="${decision.decisionContent}"></td>
       <td th:text="${decision.proposer}"></td>
       <td th:text="${decision.teamName}"></td>
-      <td th:text="${decision.proposalDate}"></td>
+      <td th:text="${decision.proposalDate!= null ? #temporals.format(decision.proposalDate, 'yyyy-MM-dd') : ''}"></td>
       <td th:text="${decision.decisionMaker}"></td>
-      <td th:text="${decision.decisionDate}"></td>
+      <td th:text="${decision.decisionDate!= null ? #temporals.format(decision.decisionDate, 'yyyy-MM-dd') : ''}"></td>
       <td>
         <a th:href="@{/arch-decisions/edit/{id}(id=${decision.id})}" class="btn btn-primary btn-sm">详情</a>
         <a th:href="@{/arch-decisions/delete/{id}(id=${decision.id})}" class="btn btn-danger btn-sm ml-2" onclick="return confirm('确定删除吗？')">删除</a>
