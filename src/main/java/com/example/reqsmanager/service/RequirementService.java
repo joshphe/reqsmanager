@@ -2,9 +2,11 @@ package com.example.reqsmanager.service;
 
 import com.example.reqsmanager.dto.*;
 import com.example.reqsmanager.entity.ArchitecturalRequirement;
+import com.example.reqsmanager.entity.Member;
 import com.example.reqsmanager.entity.Requirement;
 import com.example.reqsmanager.entity.ReviewInfo;
 import com.example.reqsmanager.repository.ArchitecturalRequirementRepository;
+import com.example.reqsmanager.repository.MemberRepository;
 import com.example.reqsmanager.repository.RequirementRepository;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -41,6 +43,8 @@ public class RequirementService {
     @Autowired
     private ArchitecturalRequirementRepository architecturalRequirementRepository;
 
+    @Autowired
+    private MemberRepository memberRepository;
     /**
      * 通用的分页查询方法。
      * 支持根据需求编号（reqId）进行模糊查询。
@@ -286,8 +290,10 @@ public class RequirementService {
     // === END ===
 
     // === START: 新增导入功能的核心方法 ===
+
     /**
      * 从上传的 CSV 文件中批量导入需求。
+     *
      * @param file 用户上传的 MultipartFile
      * @return 一个包含处理结果的摘要字符串
      */
@@ -358,15 +364,90 @@ public class RequirementService {
     // === END ===
 
     // === START: 新增批量删除方法 ===
+
     /**
      * 根据提供的 ID 列表，批量删除需求。
      * 这是一个事务性操作。
+     *
      * @param ids 要删除的需求 ID 列表
      */
     @Transactional
     public void deleteByIds(List<Integer> ids) {
         // JpaRepository 提供了高效的批量删除方法
         requirementRepository.deleteAllById(ids);
+    }
+    // === END ===
+
+    // === START: 新增“一键更新”的核心业务逻辑 ===
+
+    /**
+     * 批量更新需求的“所属小组”和“开发负责人”。
+     * 规则：
+     * 1. 遍历所有需求。
+     * 2. 根据需求的“科技负责人”姓名查找对应的成员信息。
+     * 3. 如果找到了成员，并且该成员有所属小组：
+     * a. 如果需求的“所属小组”为空，则用成员的小组信息更新它。
+     * b. 开发负责人直接更新为科技负责人的姓名。
+     * 4. 批量保存所有被修改的需求。
+     *
+     * @return 返回一个包含处理结果的摘要字符串。
+     */
+    @Transactional
+    public String batchUpdateFromTechLeader() {
+        // 1. 获取所有需求
+        List<Requirement> allRequirements = requirementRepository.findAll();
+        List<Requirement> updatedRequirements = new ArrayList<>();
+        int updatedCount = 0;
+        int skippedCount = 0;
+
+        for (Requirement req : allRequirements) {
+            String techLeaderName = req.getTechLeader();
+            boolean needsUpdate = false;
+
+            // 2. 检查是否有科技负责人
+            if (techLeaderName == null || techLeaderName.trim().isEmpty()) {
+                skippedCount++;
+                continue;
+            }
+
+            // 3. 根据科技负责人姓名查找成员信息
+            Optional<Member> memberOpt = memberRepository.findByName(techLeaderName.trim());
+
+            if (memberOpt.isPresent()) {
+                Member member = memberOpt.get();
+
+                // 4. 更新“所属小组”（仅当需求的小组为空时）
+                if (member.getTeamGroup() != null && (req.getGroupName() == null || req.getGroupName().trim().isEmpty())) {
+                    req.setGroupName(member.getTeamGroup().getName());
+                    needsUpdate = true;
+                }
+
+                // 5. 更新“开发负责人”（总是更新为科技负责人）
+                if (!techLeaderName.trim().equals(req.getDevLeader())) {
+                    req.setDevLeader(techLeaderName.trim());
+                    needsUpdate = true;
+                }
+
+            } else {
+                // 如果在成员表中找不到该负责人，则跳过
+                skippedCount++;
+                continue;
+            }
+
+            if (needsUpdate) {
+                updatedRequirements.add(req);
+                updatedCount++;
+            } else {
+                skippedCount++;
+            }
+        }
+
+        // 6. 批量保存所有已更新的需求
+        if (!updatedRequirements.isEmpty()) {
+            requirementRepository.saveAll(updatedRequirements);
+        }
+
+        return String.format("一键更新完成！成功更新记录: %d 条，跳过或无需更新记录: %d 条。", updatedCount, skippedCount);
     }
     // === END ===
 }

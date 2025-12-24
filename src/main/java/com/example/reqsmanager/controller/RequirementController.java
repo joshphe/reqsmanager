@@ -20,7 +20,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/requirements")
@@ -281,6 +283,28 @@ public class RequirementController {
             return ResponseEntity.ok("{\"status\": \"success\", \"message\": \"批量删除成功！\"}");
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("{\"status\": \"error\", \"message\": \"删除失败: " + e.getMessage() + "\"}");
+        }
+    }
+    // === END ===
+
+    // === START: 新增“一键更新”的处理方法 ===
+    /**
+     * 处理“一键更新”的请求。
+     * @return 返回一个表示操作结果的 JSON 响应
+     */
+    @PostMapping("/batch-update")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> batchUpdate() {
+        Map<String, String> response = new HashMap<>();
+        try {
+            String message = requirementService.batchUpdateFromTechLeader();
+            response.put("status", "success");
+            response.put("message", message);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("status", "error");
+            response.put("message", "更新失败: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
         }
     }
     // === END ===

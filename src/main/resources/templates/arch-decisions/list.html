@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="content">
+  <h1>架构决策管理</h1>
+  <hr>
+  <div class="d-flex justify-content-between mb-3">
+    <form th:action="@{/arch-decisions/}" method="get" class="form-inline">
+      <input type="text" name="reqId" th:value="${reqId}" placeholder="按关联需求编号筛选" class="form-control mr-2">
+      <button type="submit" class="btn btn-primary">筛选</button>
+    </form>
+    <a th:href="@{/arch-decisions/create}" class="btn btn-success">新增决策</a>
+  </div>
+  <table class="table table-striped">
+    <thead class="thead-dark">
+    <tr>
+      <th>序号</th><th>决策编号</th><th>决策内容</th><th>提出方</th><th>所属团队</th><th>提出日期</th><th>决策人员</th><th>决策日期</th><th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="decision, iter : ${page.content}">
+      <td th:text="${page.number * page.size + iter.count}"></td>
+      <td th:text="${decision.decisionNumber}"></td>
+      <td th:text="${decision.decisionContent}"></td>
+      <td th:text="${decision.proposer}"></td>
+      <td th:text="${decision.teamName}"></td>
+      <td th:text="${decision.proposalDate}"></td>
+      <td th:text="${decision.decisionMaker}"></td>
+      <td th:text="${decision.decisionDate}"></td>
+      <td>
+        <a th:href="@{/arch-decisions/edit/{id}(id=${decision.id})}" class="btn btn-primary btn-sm">详情</a>
+        <a th:href="@{/arch-decisions/delete/{id}(id=${decision.id})}" class="btn btn-danger btn-sm ml-2" onclick="return confirm('确定删除吗？')">删除</a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+  <!-- 分页控件 -->
+</div>
+</body>
+</html>

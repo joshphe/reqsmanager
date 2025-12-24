@@ -62,6 +62,9 @@
         <li class="nav-item"><a class="nav-link" th:href="@{/arch-projects/}"
                                 th:classappend="${view != null and view.startsWith('arch-projects') ? 'active' : ''}">架构项目管理</a>
         </li>
+        <li class="nav-item"><a class="nav-link" th:href="@{/arch-decisions/}"
+                                th:classappend="${view.startsWith('arch-decisions') ? 'active' : ''}">架构决策管理</a>
+        </li>
         <!-- === START: 新增系统配置折叠菜单 === -->
         <li class="nav-item">
             <a class="nav-link dropdown-toggle" href="#systemConfigMenu" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="systemConfigMenu">
@@ -162,6 +165,36 @@
                             });
                         }
                     });
+                    // === START: 新增“一键更新”的 JS 逻辑 ===
+                    $('#batchUpdateBtn').on('click', function() {
+                        if (confirm('确定要根据“科技负责人”批量更新“所属小组”和“开发负责人”吗？\n此操作会覆盖空的所属小组和所有的开发负责人信息。')) {
+                            // 禁用按钮，防止重复点击
+                            $(this).prop('disabled', true).text('正在更新...');
+
+                            $.ajax({
+                                url: '/requirements/batch-update',
+                                type: 'POST',
+                                contentType: 'application/json',
+                                success: function(response) {
+                                    alert(response.message || '操作成功！页面将刷新。');
+                                    location.reload();
+                                },
+                                error: function(xhr) {
+                                    var errorMsg = "更新失败！";
+                                    try {
+                                        var res = JSON.parse(xhr.responseText);
+                                        if (res && res.message) {
+                                            errorMsg += " 原因: " + res.message;
+                                        }
+                                    } catch (e) {}
+                                    alert(errorMsg);
+                                    // 失败后恢复按钮状态
+                                    $('#batchUpdateBtn').prop('disabled', false).text('一键更新');
+                                }
+                            });
+                        }
+                    });
+                    // === END ===
                 }
 
                 // ===============================================

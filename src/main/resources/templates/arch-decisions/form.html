@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title th:text="${pageTitle}"></title>
+  <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+<body>
+<div class="container mt-5 mb-5">
+  <h1 th:text="${pageTitle}"></h1>
+  <hr>
+  <form th:action="@{/arch-decisions/save}" th:object="${decision}" method="post">
+    <input type="hidden" th:field="*{id}">
+
+    <h5>基本信息</h5>
+    <div class="form-row">
+      <div class="form-group col-md-3"><label>决策编号</label><input type="text" th:field="*{decisionNumber}" class="form-control" required></div>
+      <div class="form-group col-md-3"><label>提出方</label><input type="text" th:field="*{proposer}" id="proposerInput" class="form-control"></div>
+      <div class="form-group col-md-3"><label>所属团队</label><input type="text" th:field="*{teamName}" id="teamNameInput" class="form-control" readonly></div>
+      <div class="form-group col-md-3"><label>提出日期</label><input type="date" th:field="*{proposalDate}" class="form-control"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-6"><label>决策人员</label><input type="text" th:field="*{decisionMaker}" class="form-control"></div>
+      <div class="form-group col-md-6"><label>决策日期</label><input type="date" th:field="*{decisionDate}" class="form-control"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-6"><label>关联需求编号</label><input type="text" th:field="*{reqId}" class="form-control"></div>
+      <div class="form-group col-md-6"><label>架构领域</label><input type="text" th:field="*{architectureDomain}" class="form-control"></div>
+    </div>
+    <div class="form-group"><label>决策内容</label><textarea th:field="*{decisionContent}" class="form-control" rows="3"></textarea></div>
+
+    <hr><h5>详细描述</h5>
+    <div class="form-group"><label>问题描述</label><textarea th:field="*{problemDescription}" class="form-control" rows="3"></textarea></div>
+    <div class="form-group"><label>涉及应用</label><textarea th:field="*{affectedApplications}" class="form-control" rows="2"></textarea></div>
+    <div class="form-group"><label>假设和约束</label><textarea th:field="*{assumptionsAndConstraints}" class="form-control" rows="3"></textarea></div>
+    <div class="form-group"><label>可选决策方案</label><textarea th:field="*{alternativeSolutions}" class="form-control" rows="3"></textarea></div>
+    <div class="form-group"><label>决策理由</label><textarea th:field="*{decisionRationale}" class="form-control" rows="3"></textarea></div>
+    <div class="form-group"><label>争议的本质</label><textarea th:field="*{natureOfControversy}" class="form-control" rows="2"></textarea></div>
+    <div class="form-group"><label>影响性分析</label><textarea th:field="*{impactAnalysis}" class="form-control" rows="3"></textarea></div>
+    <div class="form-group"><label>衍生需求</label><textarea th:field="*{derivedRequirements}" class="form-control" rows="2"></textarea></div>
+    <div class="form-group"><label>相关架构决策</label><textarea th:field="*{relatedArchDecisions}" class="form-control" rows="2"></textarea></div>
+
+    <button type="submit" class="btn btn-primary">保存</button>
+    <a th:href="@{/arch-decisions/}" class="btn btn-secondary">取消</a>
+  </form>
+</div>
+
+<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+<script>
+  $(document).ready(function() {
+    $('#proposerInput').on('blur', function() {
+      var proposerName = $(this).val().trim();
+      if (proposerName === '') {
+        $('#teamNameInput').val('');
+        return;
+      }
+      $.get('/api/members/find-by-name', { name: proposerName })
+              .done(function(data) {
+                if (data && data.teamName) {
+                  $('#teamNameInput').val(data.teamName);
+                }
+              })
+              .fail(function() {
+                console.warn("未找到姓名为 '" + proposerName + "' 的成员信息。");
+                $('#teamNameInput').val(''); // 找不到则清空
+              });
+    });
+  });
+</script>
+</body>
+</html>
