@@ -330,6 +330,10 @@ public class RequirementService {
                 req.setReqType(record.get(4));
                 // F列: 牵头部室
                 req.setLeadDepartment(record.get(5));
+                // === START: 核心修改，读取 H 列作为业务条线 ===
+                // H 列的索引是 7
+                req.setBusinessLine(record.get(7));
+                // === END: 核心修改 ===
                 // N列: 计划投产日期 (索引为13)
                 try {
                     String dateStr = record.get(13);
