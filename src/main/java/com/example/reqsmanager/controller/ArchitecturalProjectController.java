@@ -3,12 +3,16 @@ package com.example.reqsmanager.controller;
 import com.example.reqsmanager.entity.ArchitecturalProject;
 import com.example.reqsmanager.service.ArchitecturalProjectService;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable; // 确保 Pageable 已导入
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -153,4 +157,61 @@ public class ArchitecturalProjectController {
         return stringValue;
     }
     // === END: 新增的导出方法 ===
+
+    // === START: 新增批量导入的处理方法 ===
+    /**
+     * 处理 CSV 文件的上传和导入请求。
+     */
+    @PostMapping("/import")
+    public String uploadFile(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
+        if (file.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "请选择一个 CSV 文件上传！");
+            return "redirect:/arch-projects/";
+        }
+
+        try {
+            String message = projectService.importFromCsv(file);
+            redirectAttributes.addFlashAttribute("success", message);
+        } catch (Exception e) {
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", "文件导入失败: " + e.getMessage());
+        }
+
+        return "redirect:/arch-projects/";
+    }
+    // === END ===
+
+    // === START: 新增导入模板下载方法 ===
+    /**
+     * 提供 CSV 导入模板的下载功能。
+     */
+    @GetMapping("/template")
+    public void downloadTemplate(HttpServletResponse response) throws IOException {
+        response.setContentType("text/csv; charset=UTF-8");
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        response.setHeader("Content-Disposition", "attachment; filename=\"arch_projects_import_template.csv\"");
+
+        String[] headers = {
+                "项目编号", "需求编号", "需求名称", "开发部室", "项目负责人"
+        };
+
+        String[] exampleData = {
+                "ARCH-PROJ-DEMO-001",
+                "REQ-001",
+                "核心系统升级",
+                "创新开发部",
+                "王小明"
+        };
+
+        try (PrintWriter writer = response.getWriter();
+             CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT)) { // 使用 CSVPrinter 写入
+
+            writer.write('\ufeff'); // BOM for Excel
+            csvPrinter.printRecord((Object[]) headers); // 写入表头
+            csvPrinter.printRecord((Object[]) exampleData); // 写入样例数据
+        }
+    }
+    // === END ===
+
+
 }

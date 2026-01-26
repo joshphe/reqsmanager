@@ -8,6 +8,20 @@
 <div th:fragment="content">
   <h1>架构项目管理</h1>
   <hr>
+  <!-- === START: 新增，用于显示导入结果的提示框 === -->
+  <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+    <span th:text="${success}"></span>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <span th:text="${error}"></span>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- === END === -->
 
   <!-- 顶部操作栏：筛选和新增 -->
   <div class="d-flex justify-content-between mb-3">
@@ -17,8 +31,13 @@
       <button type="submit" class="btn btn-primary">筛选</button>
       <a th:href="@{/arch-projects/}" class="btn btn-secondary ml-2">清空筛选</a>
     </form>
+
     <!-- === START: 按钮组 === -->
     <div>
+      <a th:href="@{/arch-projects/template}" class="btn btn-outline-secondary">下载导入模板</a>
+      <button type="button" class="btn btn-secondary ml-2" data-toggle="modal" data-target="#importModal">
+        批量导入
+      </button>
       <a th:href="@{/arch-projects/create}" class="btn btn-success">新增项目</a>
       <!-- 新增导出按钮 -->
       <a th:href="@{/arch-projects/export}" class="btn btn-info ml-2">导出 CSV</a>
@@ -130,6 +149,49 @@
       </ul>
     </nav>
   </div>
+  <!-- === START: 新增，文件上传的模态弹窗 === -->
+  <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="importModalLabel">批量导入项目</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <!-- 文件上传表单 -->
+        <form th:action="@{/arch-projects/import}" method="post" enctype="multipart/form-data">
+          <div class="modal-body">
+            <p>请选择要上传的 CSV 文件。系统将根据“项目编号”跳过已存在的记录。</p>
+            <div class="custom-file">
+              <input type="file" class="custom-file-input" id="csvFile" name="file" accept=".csv" required>
+              <label class="custom-file-label" for="csvFile">选择文件...</label>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+            <button type="submit" class="btn btn-primary">上传并导入</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- === START: JavaScript 部分 === -->
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    (function($) {
+      if (typeof $ === 'undefined') { return; }
+      $(document).ready(function() {
+        // Custom file input label update
+        $('.custom-file-input').on('change', function() {
+          var fileName = $(this).val().split('\\').pop();
+          $(this).next('.custom-file-label').html(fileName);
+        });
+      });
+    })(jQuery);
+    /*]]>*/
+  </script>
+  <!-- === END === -->
 </div>
 </body>
 </html>
