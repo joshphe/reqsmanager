@@ -12,6 +12,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import jakarta.persistence.criteria.Predicate;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -25,12 +26,43 @@ public class ArchitecturalProjectService {
     @Autowired
     private ArchitecturalProjectRepository projectRepository;
 
-    public Page<ArchitecturalProject> findProjects(String reqId, Pageable pageable) {
+    /**
+     * 通用的分页查询方法。
+     * 支持根据项目编号、需求编号、需求名称、项目负责人、是否重点项目进行筛选。
+     * @param projectNumber   项目编号 (模糊匹配)
+     * @param reqId           需求编号 (模糊匹配)
+     * @param reqName         需求名称 (模糊匹配)
+     * @param projectManager  项目负责人 (精确匹配)
+     * @param isKeyProject    是否重点项目 (精确匹配)
+     * @param pageable        分页信息对象
+     * @return 包含查询结果和分页信息的一个 Page<ArchitecturalProject> 对象
+     */
+    public Page<ArchitecturalProject> findProjects(String projectNumber, String reqId, String reqName, String projectManager, Boolean isKeyProject, Pageable pageable) {
         Specification<ArchitecturalProject> spec = (root, query, cb) -> {
-            if (reqId != null && !reqId.isEmpty()) {
-                return cb.like(root.get("reqId"), "%" + reqId + "%");
+            List<Predicate> predicates = new ArrayList<>();
+
+            // 1. 项目编号 (模糊匹配)
+            if (projectNumber != null && !projectNumber.isEmpty()) {
+                predicates.add(cb.like(root.get("projectNumber"), "%" + projectNumber + "%"));
             }
-            return cb.conjunction();
+            // 2. 需求编号 (模糊匹配)
+            if (reqId != null && !reqId.isEmpty()) {
+                predicates.add(cb.like(root.get("reqId"), "%" + reqId + "%"));
+            }
+            // 3. 需求名称 (模糊匹配)
+            if (reqName != null && !reqName.isEmpty()) {
+                predicates.add(cb.like(root.get("reqName"), "%" + reqName + "%"));
+            }
+            // 4. 项目负责人 (精确匹配)
+            if (projectManager != null && !projectManager.isEmpty()) {
+                predicates.add(cb.equal(root.get("projectManager"), projectManager));
+            }
+            // 5. 是否重点项目 (精确匹配)
+            if (isKeyProject != null) {
+                predicates.add(cb.equal(root.get("keyProject"), isKeyProject));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
         };
         return projectRepository.findAll(spec, pageable);
     }

@@ -9,13 +9,47 @@
     <h1>架构需求管理</h1>
     <hr>
 
-    <!-- 筛选表单 -->
+    <!-- 筛选表单和操作按钮的整体布局 -->
     <div class="mb-3">
-        <form th:action="@{/architectural/}" method="get" class="form-inline">
-            <input type="text" name="reqId" th:value="${reqId}" placeholder="按需求编号筛选" class="form-control mr-2">
+        <form th:action="@{/architectural/}" method="get">
             <input type="hidden" name="size" th:value="${page.size}">
-            <button type="submit" class="btn btn-primary">筛选</button>
-            <a th:href="@{/architectural/}" class="btn btn-secondary ml-2">清空筛选</a>
+
+            <!-- 筛选条件 - 第一行 (需求编号 / 需求名称 / 是否重要需求) -->
+            <div class="form-row align-items-center mb-2">
+                <div class="col-md-4 form-group">
+                    <label class="col-form-label mr-2">需求编号:</label>
+                    <input type="text" name="reqId" th:value="${reqId}" class="form-control" placeholder="需求编号">
+                </div>
+                <div class="col-md-4 form-group">
+                    <label class="col-form-label mr-2">需求名称:</label>
+                    <input type="text" name="reqName" th:value="${reqName}" class="form-control" placeholder="需求名称">
+                </div>
+                <div class="col-md-4 form-group">
+                    <label class="col-form-label mr-2">重要需求:</label>
+                    <select name="isImportantRequirement" class="form-control">
+                        <option value="">-- 请选择 --</option>
+                        <option value="true" th:selected="${isImportantRequirement != null and isImportantRequirement}">是</option>
+                        <option value="false" th:selected="${isImportantRequirement != null and !isImportantRequirement}">否</option>
+                    </select>
+                </div>
+                <div class="col-md-4 form-group">
+                    <label class="col-form-label mr-2">递交概要设计:</label>
+                    <select name="isSummaryDesignSubmitted" class="form-control">
+                        <option value="">-- 请选择 --</option>
+                        <option value="true" th:selected="${isSummaryDesignSubmitted != null and isSummaryDesignSubmitted}">是</option>
+                        <option value="false" th:selected="${isSummaryDesignSubmitted != null and !isSummaryDesignSubmitted}">否</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 筛选条件 - 第二行 (是否递交概要设计 / 筛选按钮 / 清空按钮) -->
+            <div class="form-row align-items-center mb-3">
+                <!-- 筛选和清空按钮 -->
+                <div class="col-md-8 form-group text-left"> <!-- 占据剩余宽度并右对齐 -->
+                    <button type="submit" class="btn btn-primary">筛选</button>
+                    <a th:href="@{/architectural/}" class="btn btn-secondary ml-2">清空</a>
+                </div>
+            </div>
         </form>
     </div>
 
@@ -130,11 +164,23 @@
     <div th:if="${page.totalPages > 0}" class="d-flex justify-content-end mt-3">
         <nav aria-label="Page navigation">
             <ul class="pagination">
-                <li class="page-item" th:classappend="${page.first} ? 'disabled'"><a class="page-link" th:href="@{/architectural/(size=${page.size}, page=0, reqId=${reqId})}">首页</a></li>
-                <li class="page-item" th:classappend="${page.first} ? 'disabled'"><a class="page-link" th:href="@{/architectural/(size=${page.size}, page=${page.number - 1}, reqId=${reqId})}">上一页</a></li>
-                <li class="page-item" th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}" th:classappend="${i == page.number} ? 'active'"><a class="page-link" th:href="@{/architectural/(size=${page.size}, page=${i}, reqId=${reqId})}" th:text="${i + 1}"></a></li>
-                <li class="page-item" th:classappend="${page.last} ? 'disabled'"><a class="page-link" th:href="@{/architectural/(size=${page.size}, page=${page.number + 1}, reqId=${reqId})}">下一页</a></li>
-                <li class="page-item" th:classappend="${page.last} ? 'disabled'"><a class="page-link" th:href="@{/architectural/(size=${page.size}, page=${page.totalPages - 1}, reqId=${reqId})}">尾页</a></li>
+                <!-- === START: 确保分页链接包含所有筛选参数 === -->
+                <li class="page-item" th:classappend="${page.first} ? 'disabled'">
+                    <a class="page-link" th:href="@{/architectural/(size=${page.size}, page=0, reqId=${reqId}, reqName=${reqName}, isImportantRequirement=${isImportantRequirement}, isSummaryDesignSubmitted=${isSummaryDesignSubmitted})}">首页</a>
+                </li>
+                <li class="page-item" th:classappend="${page.first} ? 'disabled'">
+                    <a class="page-link" th:href="@{/architectural/(size=${page.size}, page=${page.number - 1}, reqId=${reqId}, reqName=${reqName}, isImportantRequirement=${isImportantRequirement}, isSummaryDesignSubmitted=${isSummaryDesignSubmitted})}">上一页</a>
+                </li>
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}" th:classappend="${i == page.number} ? 'active'">
+                    <a class="page-link" th:href="@{/architectural/(size=${page.size}, page=${i}, reqId=${reqId}, reqName=${reqName}, isImportantRequirement=${isImportantRequirement}, isSummaryDesignSubmitted=${isSummaryDesignSubmitted})}" th:text="${i + 1}"></a>
+                </li>
+                <li class="page-item" th:classappend="${page.last} ? 'disabled'">
+                    <a class="page-link" th:href="@{/architectural/(size=${page.size}, page=${page.number + 1}, reqId=${reqId}, reqName=${reqName}, isImportantRequirement=${isImportantRequirement}, isSummaryDesignSubmitted=${isSummaryDesignSubmitted})}">下一页</a>
+                </li>
+                <li class="page-item" th:classappend="${page.last} ? 'disabled'">
+                    <a class="page-link" th:href="@{/architectural/(size=${page.size}, page=${page.totalPages - 1}, reqId=${reqId}, reqName=${reqName}, isImportantRequirement=${isImportantRequirement}, isSummaryDesignSubmitted=${isSummaryDesignSubmitted})}">尾页</a>
+                </li>
+                <!-- === END === -->
             </ul>
         </nav>
     </div>

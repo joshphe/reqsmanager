@@ -31,11 +31,27 @@ public class ArchitecturalProjectController {
      */
     @GetMapping("/")
     public String list(Model model,
-                       @RequestParam(required = false) String reqId,
+                       // === START: 新增筛选参数 ===
+                       @RequestParam(required = false) String projectNumber,
+                       @RequestParam(required = false) String reqId, // 保持旧有的
+                       @RequestParam(required = false) String reqName,
+                       @RequestParam(required = false) String projectManager,
+                       @RequestParam(required = false) Boolean isKeyProject,
+                       // === END ===
                        Pageable pageable) { // 直接使用 Pageable, Spring 会自动创建
-        Page<ArchitecturalProject> page = projectService.findProjects(reqId, pageable);
-        model.addAttribute("page", page);
+        // === START: 将所有参数传递给 Service ===
+        Page<ArchitecturalProject> architecturalProjectPage = projectService.findProjects(
+                projectNumber, reqId, reqName, projectManager, isKeyProject, pageable);
+        // === END ===
+        model.addAttribute("page", architecturalProjectPage);
         model.addAttribute("reqId", reqId);
+        // === START: 将所有参数回传给前端 ===
+        model.addAttribute("projectNumber", projectNumber);
+        model.addAttribute("reqId", reqId);
+        model.addAttribute("reqName", reqName);
+        model.addAttribute("projectManager", projectManager);
+        model.addAttribute("isKeyProject", isKeyProject);
+        // === END ===
         model.addAttribute("view", "arch-projects/list");
         return "layout";
     }

@@ -8,6 +8,8 @@ import com.example.reqsmanager.entity.ReviewInfo;
 import com.example.reqsmanager.repository.ArchitecturalRequirementRepository;
 import com.example.reqsmanager.repository.MemberRepository;
 import com.example.reqsmanager.repository.RequirementRepository;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -18,6 +20,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import jakarta.persistence.criteria.Predicate;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -45,24 +48,69 @@ public class RequirementService {
 
     @Autowired
     private MemberRepository memberRepository;
+
     /**
      * 通用的分页查询方法。
-     * 支持根据需求编号（reqId）进行模糊查询。
-     * Fetch（预加载）逻辑已通过 Repository 层的 @EntityGraph 注解声明，以优化性能。
+     * 支持根据需求编号、需求名称、需求科技负责人，以及投产日期区间进行过滤。
      *
-     * @param reqId    用于筛选的需求编号 (可以为 null 或空)
-     * @param pageable 分页信息对象 (包含页码、每页条数等)
+     * @param reqId           用于筛选的需求编号 (可以为 null 或空)
+     * @param reqName         用于筛选的需求名称 (模糊匹配)
+     * @param techLeader      用于筛选的需求科技负责人 (精确匹配)
+     * @param startDate       投产日期起始 (包含)
+     * @param endDate         投产日期终止 (包含)
+     * @param isImportantRequirement 是否重要需求
+     * @param isSummaryDesignSubmitted 是否递交概要设计
+     * @param pageable        分页信息对象
      * @return 包含查询结果和分页信息的一个 Page<Requirement> 对象
      */
-    public Page<Requirement> findRequirements(String reqId, Pageable pageable) {
+    public Page<Requirement> findRequirements(String reqId,
+                                              String reqName,
+                                              String techLeader,
+                                              LocalDate startDate,
+                                              LocalDate endDate,
+                                              Boolean isImportantRequirement,
+                                              Boolean isSummaryDesignSubmitted,
+                                              Pageable pageable) {
         Specification<Requirement> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            // 1. 需求编号 (模糊匹配)
             if (reqId != null && !reqId.isEmpty()) {
-                return cb.like(root.get("reqId"), "%" + reqId + "%");
+                predicates.add(cb.like(root.get("reqId"), "%" + reqId + "%"));
             }
-            // 如果没有筛选条件，返回一个空的、恒为 true 的查询条件
-            return cb.conjunction();
+            // 2. 需求名称 (模糊匹配)
+            if (reqName != null && !reqName.isEmpty()) {
+                predicates.add(cb.like(root.get("name"), "%" + reqName + "%"));
+            }
+            // 3. 需求科技负责人 (精确匹配)
+            if (techLeader != null && !techLeader.isEmpty()) {
+                predicates.add(cb.equal(root.get("techLeader"), techLeader));
+            }
+            // === START: 修正排期筛选逻辑为区间查询 ===
+            if (startDate != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("scheduleDate"), startDate));
+            }
+            if (endDate != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("scheduleDate"), endDate));
+            }
+            // === END ===
+            // === START: 新增筛选逻辑 ===
+            // 5. 关联 ArchitecturalRequirement 进行筛选
+            if (isImportantRequirement != null || isSummaryDesignSubmitted != null) {
+                // 确保我们通过 LEFT JOIN 关联 archReq，因为它可能为 null
+                Join<Requirement, ArchitecturalRequirement> archReqJoin = root.join("architecturalRequirement", JoinType.LEFT);
+
+                if (isImportantRequirement != null) {
+                    predicates.add(cb.equal(archReqJoin.get("importantRequirement"), isImportantRequirement));
+                }
+                if (isSummaryDesignSubmitted != null) {
+                    predicates.add(cb.equal(archReqJoin.get("summaryDesignSubmitted"), isSummaryDesignSubmitted));
+                }
+            }
+            // === END ===
+            // 将所有条件组合
+            return cb.and(predicates.toArray(new Predicate[0]));
         };
-        // 调用在 Repository 中被 @EntityGraph 注解过的方法
         return requirementRepository.findAll(spec, pageable);
     }
 

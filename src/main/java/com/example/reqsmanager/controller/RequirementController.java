@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,6 +21,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,16 +39,31 @@ public class RequirementController {
     @GetMapping("/")
     public String list(Model model,
                        @RequestParam(required = false) String reqId,
+                       // === START: 新增筛选参数 ===
+                       @RequestParam(required = false) String reqName,
+                       @RequestParam(required = false) String techLeader,
+                       // === START: 替换 scheduleDate 为 startDate 和 endDate ===
+                       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+                       // === END ===
                        @RequestParam(defaultValue = "0") int page,
                        @RequestParam(defaultValue = "10") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<Requirement> requirementPage = requirementService.findRequirements(reqId, pageable);
+        // === START: 将新参数传递给 Service ===
+        Page<Requirement> requirementPage = requirementService.findRequirements(reqId, reqName, techLeader, startDate, endDate, null, null, pageable);
+        // === END ===
 
         model.addAttribute("page", requirementPage);
         model.addAttribute("reqId", reqId);
         model.addAttribute("size", size);
-
+        // === START: 将新参数回传给前端，以便筛选表单和分页链接保持状态 ===
+        model.addAttribute("reqName", reqName);
+        model.addAttribute("techLeader", techLeader);
+        // === START: 回传 startDate 和 endDate ===
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+        // === END ===
         model.addAttribute("view", "requirements/list");
         return "layout";
     }

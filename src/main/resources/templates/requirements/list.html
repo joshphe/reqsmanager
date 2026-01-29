@@ -24,41 +24,51 @@
     </div>
     <!-- === END === -->
 
-    <!-- 顶部操作栏：筛选和新增 -->
-    <div class="d-flex justify-content-between mb-3">
-        <!-- 筛选表单 -->
-        <form th:action="@{/requirements/}" method="get" class="form-inline">
-            <input type="text" name="reqId" th:value="${reqId}" placeholder="输入需求编号筛选" class="form-control mr-2">
-            <!-- 隐藏域，在筛选时保持分页大小不变 -->
-            <input type="hidden" name="size" th:value="${page.size}">
-            <button type="submit" class="btn btn-primary">筛选</button>
-            <a th:href="@{/requirements/}" class="btn btn-secondary ml-2">清空筛选</a>
+    <!-- === START: 筛选表单和操作按钮的整体布局 === -->
+    <div class="mb-3">
+        <form th:action="@{/requirements/}" method="get">
+            <input type="hidden" name="size" th:value="${page.size}"> <!-- 隐藏域，保持每页显示条数 -->
+
+            <!-- 筛选条件 - 第一行 (需求编号 / 需求名称 / 科技负责人) -->
+            <div class="form-row align-items-center mb-2">
+                <div class="col-md-4 form-group">
+                    <label class="col-form-label mr-2">需求编号:</label>
+                    <input type="text" name="reqId" th:value="${reqId}" class="form-control" placeholder="需求编号">
+                </div>
+                <div class="col-md-4 form-group">
+                    <label class="col-form-label mr-2">需求名称:</label>
+                    <input type="text" name="reqName" th:value="${reqName}" class="form-control" placeholder="需求名称">
+                </div>
+                <div class="col-md-4 form-group">
+                    <label class="col-form-label mr-2">科技负责人:</label>
+                    <input type="text" name="techLeader" th:value="${techLeader}" class="form-control" placeholder="科技负责人">
+                </div>
+                <div class="col-md-4 form-group">
+                    <label class="col-form-label mr-2">起始日期:</label>
+                    <input type="date" name="startDate" th:value="${startDate}" class="form-control">
+                </div>
+                <div class="col-md-4 form-group">
+                    <label class="col-form-label mr-2">结束日期:</label>
+                    <input type="date" name="endDate" th:value="${endDate}" class="form-control">
+                </div>
+            </div>
+
+            <!-- 筛选条件 - 第二行 (需求排期 / 筛选按钮 / 清空按钮) -->
+            <div class="form-row align-items-center mb-3">
+                <!-- 筛选和清空按钮 -->
+                <div class="col-md-4 form-group text-left"> <!-- 占据剩余宽度并右对齐 -->
+                    <button type="submit" class="btn btn-primary">筛选</button>
+                    <a th:href="@{/requirements/}" class="btn btn-secondary ml-2">清空</a>
+                </div>
+            </div>
         </form>
-
-
-
         <!-- 新增按钮 -->
-        <div>
-            <!-- === START: 新增“一键更新”按钮 === -->
-            <button type="button" class="btn btn-warning" id="batchUpdateBtn">
-                一键更新
-            </button>
-            <!-- === END === -->
-            <button type="button" class="btn btn-danger" id="batchDeleteBtn">
-                批量删除
-            </button>
-            <!-- === START: 新增“下载模板”链接 === -->
-            <a th:href="@{/requirements/template}" class="btn btn-outline-secondary">
-                下载导入模板
-            </a>
-            <!-- === END === -->
-            <!-- === START: 新增“批量导入”按钮 === -->
-            <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#importModal">
-                批量导入
-            </button>
-            <!-- === END === -->
-            <a th:href="@{/requirements/create}" class="btn btn-success">新增需求</a>
-            <!-- 新增导出按钮 -->
+        <div class="d-flex justify-content-end mb-3">
+            <button type="button" class="btn btn-warning" id="batchUpdateBtn">一键更新</button>
+            <button type="button" class="btn btn-danger ml-2" id="batchDeleteBtn">批量删除</button>
+            <a th:href="@{/requirements/template}" class="btn btn-outline-secondary ml-2">下载导入模板</a>
+            <button type="button" class="btn btn-secondary ml-2" data-toggle="modal" data-target="#importModal">批量导入</button>
+            <a th:href="@{/requirements/create}" class="btn btn-success ml-2">新增需求</a>
             <a th:href="@{/requirements/export}" class="btn btn-info ml-2">导出 CSV</a>
         </div>
     </div>
@@ -131,11 +141,23 @@
     <div th:if="${page.totalPages > 0}" class="d-flex justify-content-end mt-3">
         <nav aria-label="Page navigation">
             <ul class="pagination">
-                <li class="page-item" th:classappend="${page.first} ? 'disabled'"><a class="page-link" th:href="@{/requirements/(size=${page.size}, page=0, reqId=${reqId})}">首页</a></li>
-                <li class="page-item" th:classappend="${page.first} ? 'disabled'"><a class="page-link" th:href="@{/requirements/(size=${page.size}, page=${page.number - 1}, reqId=${reqId})}">上一页</a></li>
-                <li class="page-item" th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}" th:classappend="${i == page.number} ? 'active'"><a class="page-link" th:href="@{/requirements/(size=${page.size}, page=${i}, reqId=${reqId})}" th:text="${i + 1}"></a></li>
-                <li class="page-item" th:classappend="${page.last} ? 'disabled'"><a class="page-link" th:href="@{/requirements/(size=${page.size}, page=${page.number + 1}, reqId=${reqId})}">下一页</a></li>
-                <li class="page-item" th:classappend="${page.last} ? 'disabled'"><a class="page-link" th:href="@{/requirements/(size=${page.size}, page=${page.totalPages - 1}, reqId=${reqId})}">尾页</a></li>
+                <!-- === START: 确保分页链接包含所有筛选参数 === -->
+                <li class="page-item" th:classappend="${page.first} ? 'disabled'">
+                    <a class="page-link" th:href="@{/requirements/(size=${page.size}, page=0, reqId=${reqId}, reqName=${reqName}, techLeader=${techLeader}, startDate=${startDate}, endDate=${endDate})}">首页</a>
+                </li>
+                <li class="page-item" th:classappend="${page.first} ? 'disabled'">
+                    <a class="page-link" th:href="@{/requirements/(size=${page.size}, page=${page.number - 1}, reqId=${reqId}, reqName=${reqName}, techLeader=${techLeader}, startDate=${startDate}, endDate=${endDate})}">上一页</a>
+                </li>
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}" th:classappend="${i == page.number} ? 'active'">
+                    <a class="page-link" th:href="@{/requirements/(size=${page.size}, page=${i}, reqId=${reqId}, reqName=${reqName}, techLeader=${techLeader}, startDate=${startDate}, endDate=${endDate})}" th:text="${i + 1}"></a>
+                </li>
+                <li class="page-item" th:classappend="${page.last} ? 'disabled'">
+                    <a class="page-link" th:href="@{/requirements/(size=${page.size}, page=${page.number + 1}, reqId=${reqId}, reqName=${reqName}, techLeader=${techLeader}, startDate=${startDate}, endDate=${endDate})}">下一页</a>
+                </li>
+                <li class="page-item" th:classappend="${page.last} ? 'disabled'">
+                    <a class="page-link" th:href="@{/requirements/(size=${page.size}, page=${page.totalPages - 1}, reqId=${reqId}, reqName=${reqName}, techLeader=${techLeader}, startDate=${startDate}, endDate=${endDate})}">尾页</a>
+                </li>
+                <!-- === END === -->
             </ul>
         </nav>
     </div>

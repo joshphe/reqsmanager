@@ -23,26 +23,56 @@
   </div>
   <!-- === END === -->
 
-  <!-- 顶部操作栏：筛选和新增 -->
-  <div class="d-flex justify-content-between mb-3">
-    <form th:action="@{/arch-projects/}" method="get" class="form-inline">
-      <input type="text" name="reqId" th:value="${reqId}" placeholder="按需求编号筛选" class="form-control mr-2">
-      <input type="hidden" name="size" th:value="${page.size}">
-      <button type="submit" class="btn btn-primary">筛选</button>
-      <a th:href="@{/arch-projects/}" class="btn btn-secondary ml-2">清空筛选</a>
+  <!-- === START: 筛选表单和操作按钮的整体布局 === -->
+  <div class="mb-3">
+    <form th:action="@{/arch-projects/}" method="get">
+      <input type="hidden" name="size" th:value="${page.size}"> <!-- 隐藏域，保持每页显示条数 -->
+
+      <!-- 筛选条件 - 第一行 (项目编号 / 需求编号 / 需求名称) -->
+      <div class="form-row align-items-center mb-2">
+        <div class="col-md-4 form-group">
+          <label class="col-form-label mr-2">项目编号:</label>
+          <input type="text" id="filterProjectNumber" name="projectNumber" th:value="${projectNumber}" class="form-control" placeholder="项目编号">
+        </div>
+        <div class="col-md-4 form-group">
+          <label class="col-form-label mr-2">需求编号:</label>
+          <input type="text" id="filterReqId" name="reqId" th:value="${reqId}" class="form-control" placeholder="需求编号">
+        </div>
+        <div class="col-md-4 form-group">
+          <label class="col-form-label mr-2">需求名称:</label>
+          <input type="text" id="filterReqName" name="reqName" th:value="${reqName}" class="form-control" placeholder="需求名称">
+        </div>
+        <div class="col-md-4 form-group">
+          <label class="col-form-label mr-2">项目负责人:</label>
+          <input type="text" id="filterProjectManager" name="projectManager" th:value="${projectManager}" class="form-control" placeholder="项目负责人">
+        </div>
+        <div class="col-md-4 form-group">
+          <label class="col-form-label mr-2">是否重点项目:</label>
+          <select name="isKeyProject" class="form-control">
+            <option value="">-- 请选择 --</option>
+            <option value="true" th:selected="${isKeyProject != null and isKeyProject}">是</option>
+            <option value="false" th:selected="${isKeyProject != null and !isKeyProject}">否</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 筛选条件 - 第二行 (项目负责人 / 是否重点项目 / 筛选按钮) -->
+      <div class="form-row align-items-center mb-3">
+        <!-- 筛选和清空按钮 -->
+        <div class="col-md-4 form-group text-left"> <!-- 占据剩余宽度并右对齐 -->
+          <button type="submit" class="btn btn-primary">筛选</button>
+          <a th:href="@{/arch-projects/}" class="btn btn-secondary ml-2">清空</a>
+        </div>
+      </div>
     </form>
 
-    <!-- === START: 按钮组 === -->
-    <div>
+    <!-- 操作按钮组 (新增/导入/导出) -->
+    <div class="d-flex justify-content-end mb-3">
       <a th:href="@{/arch-projects/template}" class="btn btn-outline-secondary">下载导入模板</a>
-      <button type="button" class="btn btn-secondary ml-2" data-toggle="modal" data-target="#importModal">
-        批量导入
-      </button>
-      <a th:href="@{/arch-projects/create}" class="btn btn-success">新增项目</a>
-      <!-- 新增导出按钮 -->
+      <button type="button" class="btn btn-secondary ml-2" data-toggle="modal" data-target="#importModal">批量导入</button>
+      <a th:href="@{/arch-projects/create}" class="btn btn-success ml-2">新增项目</a>
       <a th:href="@{/arch-projects/export}" class="btn btn-info ml-2">导出 CSV</a>
     </div>
-    <!-- === END: 按钮组 === -->
   </div>
 
   <!-- 表格容器 -->
@@ -141,11 +171,23 @@
   <div th:if="${page.totalPages > 0}" class="d-flex justify-content-end mt-3">
     <nav aria-label="Page navigation">
       <ul class="pagination">
-        <li class="page-item" th:classappend="${page.first} ? 'disabled'"><a class="page-link" th:href="@{/arch-projects/(size=${page.size}, page=0, reqId=${reqId})}">首页</a></li>
-        <li class="page-item" th:classappend="${page.first} ? 'disabled'"><a class="page-link" th:href="@{/arch-projects/(size=${page.size}, page=${page.number - 1}, reqId=${reqId})}">上一页</a></li>
-        <li class="page-item" th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}" th:classappend="${i == page.number} ? 'active'"><a class="page-link" th:href="@{/arch-projects/(size=${page.size}, page=${i}, reqId=${reqId})}" th:text="${i + 1}"></a></li>
-        <li class="page-item" th:classappend="${page.last} ? 'disabled'"><a class="page-link" th:href="@{/arch-projects/(size=${page.size}, page=${page.number + 1}, reqId=${reqId})}">下一页</a></li>
-        <li class="page-item" th:classappend="${page.last} ? 'disabled'"><a class="page-link" th:href="@{/arch-projects/(size=${page.size}, page=${page.totalPages - 1}, reqId=${reqId})}">尾页</a></li>
+        <!-- === START: 确保分页链接包含所有筛选参数 === -->
+        <li class="page-item" th:classappend="${page.first} ? 'disabled'">
+          <a class="page-link" th:href="@{/arch-projects/(size=${page.size}, page=0, projectNumber=${projectNumber}, reqId=${reqId}, reqName=${reqName}, projectManager=${projectManager}, isKeyProject=${isKeyProject})}">首页</a>
+        </li>
+        <li class="page-item" th:classappend="${page.first} ? 'disabled'">
+          <a class="page-link" th:href="@{/arch-projects/(size=${page.size}, page=${page.number - 1}, projectNumber=${projectNumber}, reqId=${reqId}, reqName=${reqName}, projectManager=${projectManager}, isKeyProject=${isKeyProject})}">上一页</a>
+        </li>
+        <li class="page-item" th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}" th:classappend="${i == page.number} ? 'active'">
+          <a class="page-link" th:href="@{/arch-projects/(size=${page.size}, page=${i}, projectNumber=${projectNumber}, reqId=${reqId}, reqName=${reqName}, projectManager=${projectManager}, isKeyProject=${isKeyProject})}" th:text="${i + 1}"></a>
+        </li>
+        <li class="page-item" th:classappend="${page.last} ? 'disabled'">
+          <a class="page-link" th:href="@{/arch-projects/(size=${page.size}, page=${page.number + 1}, projectNumber=${projectNumber}, reqId=${reqId}, reqName=${reqName}, projectManager=${projectManager}, isKeyProject=${isKeyProject})}">下一页</a>
+        </li>
+        <li class="page-item" th:classappend="${page.last} ? 'disabled'">
+          <a class="page-link" th:href="@{/arch-projects/(size=${page.size}, page=${page.totalPages - 1}, projectNumber=${projectNumber}, reqId=${reqId}, reqName=${reqName}, projectManager=${projectManager}, isKeyProject=${isKeyProject})}">尾页</a>
+        </li>
+        <!-- === END === -->
       </ul>
     </nav>
   </div>

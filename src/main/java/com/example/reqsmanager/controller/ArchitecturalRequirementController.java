@@ -37,6 +37,11 @@ public class ArchitecturalRequirementController {
     @GetMapping("/")
     public String list(Model model,
                        @RequestParam(required = false) String reqId,
+                       // === START: 新增筛选参数 ===
+                       @RequestParam(required = false) String reqName,
+                       @RequestParam(required = false) Boolean isImportantRequirement,
+                       @RequestParam(required = false) Boolean isSummaryDesignSubmitted,
+                       // === END ===
                        @RequestParam(defaultValue = "0") int page,
                        @RequestParam(defaultValue = "10") int size) {
 
@@ -44,13 +49,19 @@ public class ArchitecturalRequirementController {
         Pageable pageable = PageRequest.of(page, size);
 
         // 2. 将 pageable 对象传递给 Service 层
-        Page<Requirement> requirementPage = requirementService.findRequirements(reqId, pageable);
+        // === START: 核心修正：为新增的筛选参数传递 null ===
+        Page<Requirement> requirementPage = requirementService.findRequirements(reqId, reqName, null, null, null, isImportantRequirement, isSummaryDesignSubmitted, pageable);
+        // === END ===
 
         // 3. 将返回的 Page 对象和 size 一并传给前端
         model.addAttribute("page", requirementPage);
         model.addAttribute("reqId", reqId);
         model.addAttribute("size", size); // 确保 size 被传递，以便翻页链接能保持每页条数
-
+        // === START: 将新参数回传给前端 ===
+        model.addAttribute("reqName", reqName);
+        model.addAttribute("isImportantRequirement", isImportantRequirement);
+        model.addAttribute("isSummaryDesignSubmitted", isSummaryDesignSubmitted);
+        // === END ===
         model.addAttribute("view", "architectural/list");
         return "layout";
     }

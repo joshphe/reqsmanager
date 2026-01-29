@@ -35,7 +35,9 @@ public class AnalysisController {
 
         Pageable pageable = PageRequest.of(page, size);
         // 复用通用的查询方法
-        Page<Requirement> requirementPage = requirementService.findRequirements(reqId, pageable);
+        // === START: 核心修正：为新增的筛选参数传递 null ===
+        Page<Requirement> requirementPage = requirementService.findRequirements(reqId, null, null, null, null, null, null, pageable);
+        // === END ===
 
         model.addAttribute("page", requirementPage); // 向前端传递 Page 对象
         model.addAttribute("reqId", reqId); // 回传筛选条件
