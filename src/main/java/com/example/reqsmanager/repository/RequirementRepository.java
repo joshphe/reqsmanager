@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RequirementRepository extends JpaRepository<Requirement, Integer>, JpaSpecificationExecutor<Requirement> {
@@ -38,5 +39,14 @@ public interface RequirementRepository extends JpaRepository<Requirement, Intege
      * @return 如果存在则返回 true，否则返回 false
      */
     boolean existsByReqId(String reqId);
+    // === END ===
+
+    // === START: 新增方法 ===
+    /**
+     * 根据需求编号查找需求。
+     * @param reqId 需求编号
+     * @return 包含 Requirement 的 Optional 对象
+     */
+    Optional<Requirement> findByReqId(String reqId);
     // === END ===
 }

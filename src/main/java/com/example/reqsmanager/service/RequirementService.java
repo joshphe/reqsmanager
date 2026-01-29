@@ -335,83 +335,134 @@ public class RequirementService {
     public List<GroupMetricsDTO> getGroupMetrics() {
         return requirementRepository.findGroupMetrics();
     }
-    // === END ===
-
-    // === START: 新增导入功能的核心方法 ===
 
     /**
      * 从上传的 CSV 文件中批量导入需求。
+     * 支持“新增或更新”逻辑：
+     * - 若需求编号存在，则比对关联信息，有变化则更新，无变化则跳过。
+     * - 若需求编号不存在，则新增。
      *
      * @param file 用户上传的 MultipartFile
      * @return 一个包含处理结果的摘要字符串
      */
     @Transactional
     public String importFromCsv(MultipartFile file) {
-        List<Requirement> newRequirements = new ArrayList<>();
+        int addedCount = 0;
+        int updatedCount = 0;
         int skippedCount = 0;
 
-        // 定义 CSV 文件中日期的格式，例如 "2023/1/1"
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/M/d");
 
         try (BufferedReader fileReader = new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
-            // 配置 CSV 解析器，假设文件有表头，我们将忽略它
-            CSVParser csvParser = new CSVParser(fileReader,
-                    CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim());
 
-            for (CSVRecord record : csvParser) {
-                // A列: 需求编号 (索引为0)
-                String reqId = record.get(0);
+            CSVFormat csvFormat = CSVFormat.DEFAULT.builder()
+                    .setHeader()
+                    .setSkipHeaderRecord(true)
+                    .setIgnoreHeaderCase(true)
+                    .setTrim(true)
+                    .build();
 
-                // 如果需求编号为空或已存在，则跳过
-                if (reqId == null || reqId.isEmpty() || requirementRepository.existsByReqId(reqId)) {
-                    skippedCount++;
-                    continue;
-                }
+            try (CSVParser csvParser = new CSVParser(fileReader, csvFormat)) {
+                for (CSVRecord record : csvParser) {
+                    String reqIdFromCsv = record.get(0).trim(); // A列: 需求编号
 
-                Requirement req = new Requirement();
-                req.setReqId(reqId);
-                // B列: 需求名称
-                req.setName(record.get(1));
-                // D列: 需求科技负责人
-                req.setTechLeader(record.get(3));
-                // E列: 需求类型
-                req.setReqType(record.get(4));
-                // F列: 牵头部室
-                req.setLeadDepartment(record.get(5));
-                // === START: 核心修改，读取 H 列作为业务条线 ===
-                // H 列的索引是 7
-                req.setBusinessLine(record.get(7));
-                // === END: 核心修改 ===
-                // N列: 计划投产日期 (索引为13)
-                try {
-                    String dateStr = record.get(13);
-                    if (dateStr != null && !dateStr.isEmpty()) {
-                        req.setScheduleDate(LocalDate.parse(dateStr, dateFormatter));
+                    if (reqIdFromCsv.isEmpty()) {
+                        skippedCount++;
+                        continue;
                     }
-                } catch (Exception e) {
-                    // 日期格式错误，可以记录日志，但我们选择跳过这个字段
-                    System.err.println("Skipping invalid date format for reqId: " + reqId);
+
+                    Optional<Requirement> existingReqOpt = requirementRepository.findByReqId(reqIdFromCsv); // 需要在 Repository 中新增 findByReqId 方法
+
+                    if (existingReqOpt.isPresent()) {
+                        // === 存在：执行更新或跳过 ===
+                        Requirement existingReq = existingReqOpt.get();
+                        boolean hasChanges = false; // 标记是否有更新
+
+                        // 字段比对和更新
+                        // 需求名称
+                        String nameFromCsv = record.get(1).trim();
+                        if (!nameFromCsv.equals(existingReq.getName())) {
+                            existingReq.setName(nameFromCsv);
+                            hasChanges = true;
+                        }
+                        // 科技负责人
+                        String techLeaderFromCsv = record.get(3).trim();
+                        if (!techLeaderFromCsv.equals(existingReq.getTechLeader())) {
+                            existingReq.setTechLeader(techLeaderFromCsv);
+                            hasChanges = true;
+                        }
+                        // 需求类型
+                        String reqTypeFromCsv = record.get(4).trim();
+                        if (!reqTypeFromCsv.equals(existingReq.getReqType())) {
+                            existingReq.setReqType(reqTypeFromCsv);
+                            hasChanges = true;
+                        }
+                        // 牵头部室
+                        String leadDepartmentFromCsv = record.get(5).trim();
+                        if (!leadDepartmentFromCsv.equals(existingReq.getLeadDepartment())) {
+                            existingReq.setLeadDepartment(leadDepartmentFromCsv);
+                            hasChanges = true;
+                        }
+                        // 业务条线
+                        String businessLineFromCsv = record.get(7).trim();
+                        if (!businessLineFromCsv.equals(existingReq.getBusinessLine())) {
+                            existingReq.setBusinessLine(businessLineFromCsv);
+                            hasChanges = true;
+                        }
+                        // 计划投产日期
+                        try {
+                            String dateStr = record.get(13);
+                            LocalDate scheduleDateFromCsv = dateStr != null && !dateStr.isEmpty() ? LocalDate.parse(dateStr, dateFormatter) : null;
+                            if (!Optional.ofNullable(scheduleDateFromCsv).equals(Optional.ofNullable(existingReq.getScheduleDate()))) {
+                                existingReq.setScheduleDate(scheduleDateFromCsv);
+                                hasChanges = true;
+                            }
+                        } catch (Exception e) {
+                            System.err.println("Invalid date format for reqId: " + reqIdFromCsv);
+                            // 保持现有值或根据需求设置为 null
+                        }
+
+                        if (hasChanges) {
+                            requirementRepository.save(existingReq); // 保存更新
+                            updatedCount++;
+                        } else {
+                            skippedCount++; // 无变化，跳过
+                        }
+
+                    } else {
+                        // === 不存在：执行新增 ===
+                        Requirement newReq = new Requirement();
+                        newReq.setReqId(reqIdFromCsv);
+                        newReq.setName(record.get(1).trim());
+                        newReq.setTechLeader(record.get(3).trim());
+                        newReq.setReqType(record.get(4).trim());
+                        newReq.setLeadDepartment(record.get(5).trim());
+                        newReq.setBusinessLine(record.get(7).trim());
+
+                        try {
+                            String dateStr = record.get(13);
+                            if (dateStr != null && !dateStr.isEmpty()) {
+                                newReq.setScheduleDate(LocalDate.parse(dateStr, dateFormatter));
+                            }
+                        } catch (Exception e) {
+                            System.err.println("Skipping invalid date format for reqId: " + reqIdFromCsv);
+                        }
+
+                        // 级联创建空的 ArchitecturalRequirement
+                        ArchitecturalRequirement archReq = new ArchitecturalRequirement();
+                        archReq.setRequirement(newReq);
+                        newReq.setArchitecturalRequirement(archReq);
+
+                        requirementRepository.save(newReq); // 保存新增
+                        addedCount++;
+                    }
                 }
-
-                // 级联创建空的关联对象
-                ArchitecturalRequirement archReq = new ArchitecturalRequirement();
-                archReq.setRequirement(req);
-                req.setArchitecturalRequirement(archReq);
-
-                newRequirements.add(req);
             }
-
-            // 批量保存所有新需求，比逐条保存性能更好
-            if (!newRequirements.isEmpty()) {
-                requirementRepository.saveAll(newRequirements);
-            }
-
         } catch (Exception e) {
-            // 抛出运行时异常，触发事务回滚
-            throw new RuntimeException("CSV 文件处理失败: " + e.getMessage());
+            throw new RuntimeException("CSV 文件处理失败: " + e.getMessage(), e);
         }
 
-        return String.format("导入完成！新增记录: %d 条，跳过重复记录: %d 条。", newRequirements.size(), skippedCount);
+        return String.format("导入完成！新增记录: %d 条，更新记录: %d 条，跳过记录: %d 条。", addedCount, updatedCount, skippedCount);
     }
     // === END ===
 
