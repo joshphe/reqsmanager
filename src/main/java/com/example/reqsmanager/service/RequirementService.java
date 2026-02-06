@@ -164,11 +164,23 @@ public class RequirementService {
      * @return 需求状态字符串 ("进行中" 或 "已投产")
      */
     private String determineStatus(LocalDate scheduleDate) {
-        if (scheduleDate != null && scheduleDate.isBefore(LocalDate.now())) {
+        // 如果投产日期为空，则默认为“进行中”
+        if (scheduleDate == null) {
+            return "进行中";
+        }
+        // === START: 修正判断逻辑 ===
+        // 获取当前日期，确保 JVM 时区已统一
+        LocalDate today = LocalDate.now();
+        // 如果投产日期早于或等于当前日期，则为“已投产”
+        if (scheduleDate.isBefore(today) || scheduleDate.isEqual(today)) {
             return "已投产";
         }
+        // === END ===
+        // 否则为“进行中”
         return "进行中";
     }
+
+
 
     /**
      * 创建一个全新的需求。
@@ -238,9 +250,9 @@ public class RequirementService {
         // === END: 新增 ===
         requirement.setBusinessLine(dto.getBusinessLine());
         requirement.setDevLeader(dto.getDevLeader());
-        requirement.setScheduleDate(dto.getScheduleDate());
-        // === START: 自动设置状态 ===
-        requirement.setStatus(determineStatus(dto.getScheduleDate()));
+        // === START: 核心修正：确保 scheduleDate 被设置后，立刻计算并设置 status ===
+        requirement.setScheduleDate(dto.getScheduleDate()); // 先设置投产日期
+        requirement.setStatus(determineStatus(dto.getScheduleDate())); // 再根据新日期计算状态
         // === END ===
         return requirementRepository.save(requirement);
     }
@@ -448,15 +460,15 @@ public class RequirementService {
                         // 计划投产日期
                         if (!Optional.ofNullable(scheduleDateFromCsv).equals(Optional.ofNullable(existingReq.getScheduleDate()))) {
                             existingReq.setScheduleDate(scheduleDateFromCsv);
-                            existingReq.setStatus(determineStatus(scheduleDateFromCsv)); // === 自动设置状态 ===
+                            existingReq.setStatus(determineStatus(scheduleDateFromCsv)); // === 核心修正：更新 scheduleDate 后，更新 status ===
                             hasChanges = true;
                         }
 
                         if (hasChanges) {
-                            requirementRepository.save(existingReq); // 保存更新
+                            requirementRepository.save(existingReq);
                             updatedCount++;
                         } else {
-                            skippedCount++; // 无变化，跳过
+                            skippedCount++;
                         }
 
                     } else {
