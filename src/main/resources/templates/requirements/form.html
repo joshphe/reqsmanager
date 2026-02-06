@@ -99,6 +99,13 @@
                    th:value="${dto.scheduleDate != null ? #temporals.format(dto.scheduleDate, 'yyyy-MM-dd') : ''}">
         </div>
 
+        <!-- === START: 新增只读显示 === -->
+        <div class="form-group">
+            <label>需求状态</label>
+            <input type="text" th:field="*{status}" class="form-control-plaintext" readonly>
+        </div>
+        <!-- === END === -->
+
         <!-- 操作按钮 -->
         <button type="submit" class="btn btn-primary">保存</button>
         <a th:href="@{/requirements/}" class="btn btn-secondary">取消</a>

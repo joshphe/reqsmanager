@@ -19,6 +19,9 @@ public class RequirementExportDTO {
     private String businessLine;
     private String devLeader;
     private LocalDate scheduleDate;
+    // === START: 新增字段 ===
+    private String status;
+    // === END: 新增字段 ===
 
     // 架构需求信息
     private Boolean isImportantRequirement;

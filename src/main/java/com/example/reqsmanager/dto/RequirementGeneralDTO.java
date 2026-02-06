@@ -20,4 +20,7 @@ public class RequirementGeneralDTO {
     private String businessLine;
     private String devLeader;
     private LocalDate scheduleDate;
+    // === START: 新增字段 ===
+    private String status;
+    // === END: 新增字段 ===
 }

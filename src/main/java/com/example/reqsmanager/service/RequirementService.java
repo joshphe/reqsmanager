@@ -70,6 +70,7 @@ public class RequirementService {
                                               LocalDate endDate,
                                               Boolean isImportantRequirement,
                                               Boolean isSummaryDesignSubmitted,
+                                              String status,
                                               Pageable pageable) {
         Specification<Requirement> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -107,6 +108,11 @@ public class RequirementService {
                     predicates.add(cb.equal(archReqJoin.get("summaryDesignSubmitted"), isSummaryDesignSubmitted));
                 }
             }
+            // === START: 筛选需求状态 ===
+            if (status != null && !status.isEmpty()) {
+                predicates.add(cb.equal(root.get("status"), status));
+            }
+            // === END ===
             // === END ===
             // 将所有条件组合
             return cb.and(predicates.toArray(new Predicate[0]));
@@ -153,6 +159,18 @@ public class RequirementService {
     }
 
     /**
+     * [辅助方法] 根据投产日期自动设置需求状态。
+     * @param scheduleDate 投产日期
+     * @return 需求状态字符串 ("进行中" 或 "已投产")
+     */
+    private String determineStatus(LocalDate scheduleDate) {
+        if (scheduleDate != null && scheduleDate.isBefore(LocalDate.now())) {
+            return "已投产";
+        }
+        return "进行中";
+    }
+
+    /**
      * 创建一个全新的需求。
      * 这是一个事务性操作。
      * 关键逻辑：在创建主需求(Requirement)的同时，会自动创建一个空的、与之关联的架构需求(ArchitecturalRequirement)记录。
@@ -178,7 +196,9 @@ public class RequirementService {
         req.setBusinessLine(dto.getBusinessLine());
         req.setDevLeader(dto.getDevLeader());
         req.setScheduleDate(dto.getScheduleDate());
-
+        // === START: 自动设置状态 ===
+        req.setStatus(determineStatus(dto.getScheduleDate()));
+        // === END ===
         // 创建一个空的、关联的架构需求对象
         ArchitecturalRequirement archReq = new ArchitecturalRequirement();
         archReq.setRequirement(req); // 建立关联：将主需求设置到架构需求中
@@ -219,7 +239,9 @@ public class RequirementService {
         requirement.setBusinessLine(dto.getBusinessLine());
         requirement.setDevLeader(dto.getDevLeader());
         requirement.setScheduleDate(dto.getScheduleDate());
-
+        // === START: 自动设置状态 ===
+        requirement.setStatus(determineStatus(dto.getScheduleDate()));
+        // === END ===
         return requirementRepository.save(requirement);
     }
 
@@ -312,7 +334,9 @@ public class RequirementService {
         dto.setBusinessLine(req.getBusinessLine());
         dto.setDevLeader(req.getDevLeader());
         dto.setScheduleDate(req.getScheduleDate());
-
+        // === START: 映射 status ===
+        dto.setStatus(req.getStatus());
+        // === END ===
         // 2. 映射关联的架构需求信息 (进行空指针安全检查)
         ArchitecturalRequirement archReq = req.getArchitecturalRequirement();
         if (archReq != null) {
@@ -365,11 +389,23 @@ public class RequirementService {
             try (CSVParser csvParser = new CSVParser(fileReader, csvFormat)) {
                 for (CSVRecord record : csvParser) {
                     String reqIdFromCsv = record.get(0).trim(); // A列: 需求编号
-
                     if (reqIdFromCsv.isEmpty()) {
                         skippedCount++;
                         continue;
                     }
+
+                    // === START: 核心修正：将 scheduleDateFromCsv 变量定义在循环外部 ===
+                    LocalDate scheduleDateFromCsv = null; // 默认为 null
+                    try {
+                        String dateStr = record.get(13); // N列: 计划投产日期
+                        if (dateStr != null && !dateStr.isEmpty()) {
+                            scheduleDateFromCsv = LocalDate.parse(dateStr, dateFormatter);
+                        }
+                    } catch (Exception e) {
+                        System.err.println("Skipping invalid date format for reqId: " + reqIdFromCsv + ", value: " + record.get(13));
+                        // 此时 scheduleDateFromCsv 保持为 null
+                    }
+                    // === END ===
 
                     Optional<Requirement> existingReqOpt = requirementRepository.findByReqId(reqIdFromCsv); // 需要在 Repository 中新增 findByReqId 方法
 
@@ -410,16 +446,10 @@ public class RequirementService {
                             hasChanges = true;
                         }
                         // 计划投产日期
-                        try {
-                            String dateStr = record.get(13);
-                            LocalDate scheduleDateFromCsv = dateStr != null && !dateStr.isEmpty() ? LocalDate.parse(dateStr, dateFormatter) : null;
-                            if (!Optional.ofNullable(scheduleDateFromCsv).equals(Optional.ofNullable(existingReq.getScheduleDate()))) {
-                                existingReq.setScheduleDate(scheduleDateFromCsv);
-                                hasChanges = true;
-                            }
-                        } catch (Exception e) {
-                            System.err.println("Invalid date format for reqId: " + reqIdFromCsv);
-                            // 保持现有值或根据需求设置为 null
+                        if (!Optional.ofNullable(scheduleDateFromCsv).equals(Optional.ofNullable(existingReq.getScheduleDate()))) {
+                            existingReq.setScheduleDate(scheduleDateFromCsv);
+                            existingReq.setStatus(determineStatus(scheduleDateFromCsv)); // === 自动设置状态 ===
+                            hasChanges = true;
                         }
 
                         if (hasChanges) {
@@ -438,7 +468,6 @@ public class RequirementService {
                         newReq.setReqType(record.get(4).trim());
                         newReq.setLeadDepartment(record.get(5).trim());
                         newReq.setBusinessLine(record.get(7).trim());
-
                         try {
                             String dateStr = record.get(13);
                             if (dateStr != null && !dateStr.isEmpty()) {
@@ -447,6 +476,7 @@ public class RequirementService {
                         } catch (Exception e) {
                             System.err.println("Skipping invalid date format for reqId: " + reqIdFromCsv);
                         }
+                        newReq.setStatus(determineStatus(scheduleDateFromCsv)); // === 自动设置状态 ===
 
                         // 级联创建空的 ArchitecturalRequirement
                         ArchitecturalRequirement archReq = new ArchitecturalRequirement();

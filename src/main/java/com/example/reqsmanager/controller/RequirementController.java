@@ -46,12 +46,16 @@ public class RequirementController {
                        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
                        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
                        // === END ===
+                       // === START: 新增筛选参数 ===
+                       @RequestParam(required = false) String status,
+                       // === END ===
                        @RequestParam(defaultValue = "0") int page,
                        @RequestParam(defaultValue = "10") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
+
         // === START: 将新参数传递给 Service ===
-        Page<Requirement> requirementPage = requirementService.findRequirements(reqId, reqName, techLeader, startDate, endDate, null, null, pageable);
+        Page<Requirement> requirementPage = requirementService.findRequirements(reqId, reqName, techLeader, startDate, endDate, null, null, status, pageable);
         // === END ===
 
         model.addAttribute("page", requirementPage);
@@ -64,9 +68,12 @@ public class RequirementController {
         model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);
         // === END ===
+        model.addAttribute("status", status);
         model.addAttribute("view", "requirements/list");
         return "layout";
     }
+
+
 
     /**
      * 显示“新增需求”的表单页.
@@ -103,6 +110,7 @@ public class RequirementController {
         dto.setBusinessLine(req.getBusinessLine());
         dto.setDevLeader(req.getDevLeader());
         dto.setScheduleDate(req.getScheduleDate());
+        dto.setStatus(req.getStatus()); // === 映射 status 字段 ===
 
         model.addAttribute("dto", dto);
         model.addAttribute("pageTitle", "编辑需求");
@@ -146,7 +154,7 @@ public class RequirementController {
         // === START: 1. 在表头数组中添加“需求类型” ===
         String[] headers = {
                 "需求编号", "需求名称", "业务负责人", "科技负责人", "牵头部室", "所属小组", "需求类型", // 已添加
-                "业务条线", "开发负责人", "需求排期", "是否重要需求", "是否递交概要设计",
+                "业务条线", "开发负责人", "需求排期", "需求状态", "是否重要需求", "是否递交概要设计",
                 "概要设计递交人", "概要设计递交日期", "概要设计评审通过日期", "是否涉及架构决策", "是否涉及基础架构",
                 "是否涉及高阶汇报", "概要设计评分", "概要设计扣分原因"
         };
@@ -171,6 +179,7 @@ public class RequirementController {
                         escapeCsv(dto.getBusinessLine()),
                         escapeCsv(dto.getDevLeader()),
                         escapeCsv(dto.getScheduleDate()),
+                        escapeCsv(dto.getStatus()), // 新增
                         escapeCsv(dto.getIsImportantRequirement()),
                         escapeCsv(dto.getIsSummaryDesignSubmitted()),
                         escapeCsv(dto.getSummaryDesignSubmitter()),

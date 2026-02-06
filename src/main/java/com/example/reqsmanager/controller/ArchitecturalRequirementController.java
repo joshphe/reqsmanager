@@ -50,7 +50,7 @@ public class ArchitecturalRequirementController {
 
         // 2. 将 pageable 对象传递给 Service 层
         // === START: 核心修正：为新增的筛选参数传递 null ===
-        Page<Requirement> requirementPage = requirementService.findRequirements(reqId, reqName, null, null, null, isImportantRequirement, isSummaryDesignSubmitted, pageable);
+        Page<Requirement> requirementPage = requirementService.findRequirements(reqId, reqName, null, null, null, isImportantRequirement, isSummaryDesignSubmitted, null, pageable);
         // === END ===
 
         // 3. 将返回的 Page 对象和 size 一并传给前端

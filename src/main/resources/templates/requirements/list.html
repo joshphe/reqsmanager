@@ -51,6 +51,16 @@
                     <label class="col-form-label mr-2">结束日期:</label>
                     <input type="date" name="endDate" th:value="${endDate}" class="form-control">
                 </div>
+                <!-- === START: 核心修正：将 select 放入 col-md-4 form-group === -->
+                <div class="col-md-4 form-group">
+                    <label class="col-form-label mr-2">需求状态:</label>
+                    <select name="status" class="form-control">
+                        <option value="">-- 需求状态 --</option>
+                        <option value="进行中" th:selected="${status == '进行中'}">进行中</option>
+                        <option value="已投产" th:selected="${status == '已投产'}">已投产</option>
+                    </select>
+                </div>
+                <!-- === END === -->
             </div>
 
             <!-- 筛选条件 - 第二行 (需求排期 / 筛选按钮 / 清空按钮) -->
@@ -97,13 +107,14 @@
                 <th>业务条线</th>
                 <th>开发负责人</th>
                 <th class="col-schedule-date">需求排期</th>
+                <th>需求状态</th>
                 <th class="frozen col-last col-actions">操作</th>
             </tr>
             </thead>
             <tbody>
             <!-- 如果列表为空，显示提示 -->
             <tr th:if="${page.empty}">
-                <td colspan="8" class="text-center">没有找到相关需求</td>
+                <td colspan="12" class="text-center">没有找到相关需求</td>
             </tr>
             <!-- 遍历并显示数据 -->
             <tr th:each="req : ${page.content}">
@@ -126,6 +137,9 @@
                 <td th:text="${req.businessLine}"></td>
                 <td th:text="${req.devLeader}"></td>
                 <td class="col-schedule-date" th:text="${req.scheduleDate != null ? #temporals.format(req.scheduleDate, 'yyyy-MM-dd') : ''}"></td>
+                <!-- === START: 新增数据列 === -->
+                <td th:text="${req.status}"></td>
+                <!-- === END === -->
                 <td class="frozen col-last col-actions">
                     <a th:href="@{/requirements/edit/{id}(id=${req.id})}" class="btn btn-warning btn-sm">编辑</a>
                     <a th:href="@{/requirements/delete/{id}(id=${req.id})}"

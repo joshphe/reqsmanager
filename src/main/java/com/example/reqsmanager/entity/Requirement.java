@@ -73,6 +73,11 @@ public class Requirement {
     @Column(columnDefinition = "DATE COMMENT '需求排期'")
     private LocalDate scheduleDate;
 
+    // === START: 新增字段 ===
+    @Column(length = 20, columnDefinition = "VARCHAR(20) DEFAULT '进行中' COMMENT '需求状态'")
+    private String status = "进行中"; // 默认值为"进行中"
+    // === END: 新增字段 ===
+
     // ==================================================
     // =========== 需求分析 (Analysis) 字段 ===========
     // ==================================================
